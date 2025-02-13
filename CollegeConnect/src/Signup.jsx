@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import {Link} from 'react-router-dom';
 import './styles.css';
+import Login from './Login';
 
 const Signup = () => {
     const [form, setForm] = useState({
@@ -27,6 +29,7 @@ const Signup = () => {
     };
 
     return (
+        <div className="signup-container">
         <form className="signup-container" onSubmit={handleSubmit}>
             <div>
                 <label>Name:</label>
@@ -60,7 +63,10 @@ const Signup = () => {
             </div>
             <button type="submit">Sign Up</button>
         </form>
+        <p>Already have an account? <Link to="/">Login</Link></p>
+        </div>
     );
+    
 };
 
 export default Signup;

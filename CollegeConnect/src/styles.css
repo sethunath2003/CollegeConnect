@@ -10,7 +10,7 @@
 
 .signup-container {
     /* Basic styling for the signup container */
-    max-width: 400px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 1rem;
     border: 1px solid #ccc;
@@ -23,12 +23,12 @@ label {
 }
 
 input {
-    width: 100%;
+    width: 90%;
     margin-bottom: 1rem;
     padding: 0.5rem;
 }
 
 button {
     padding: 0.5rem 1rem;
-    cursor: pointer;
+    cursor:pointer;
 }

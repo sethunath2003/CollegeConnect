@@ -1,8 +1,26 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, { useState } from 'react';
+import {Link,useNavigate} from 'react-router-dom';
 import './styles.css';
 
 const Login = () => {
+    const navigate=useNavigate();
+    const[formData,setFormData]=useState({
+        email:'',
+        password:''
+    })
+    const handleSubmit=async (e) => {
+        e.preventDefault();
+        //login authentication logic here
+        try{
+            const loginSuccessful=true;//replace with actual login logic
+            if(loginSuccessful){
+                navigate('/homepage');
+            }
+        }
+        catch(error){
+            console.error("Login failed",error);
+        }
+    };
     return (
         <div className="login-container">
             <h2>Login</h2>
