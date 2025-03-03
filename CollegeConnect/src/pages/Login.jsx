@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {Link,useNavigate} from 'react-router-dom';
-import './styles.css';
 
 const Login = () => {
     const navigate=useNavigate();
@@ -22,10 +21,10 @@ const Login = () => {
         }
     };
     return (
-        <div className="login-container">
+        <div className="flex justify-center items-center h-screen bg-gray-100">
             <h2>Login</h2>
             <form>
-                <div>
+                <div className='flex justify-center items-center h-screen bg-gray-100'>
                     <label>Email:</label>
                     <input type="email" required />
                 </div>

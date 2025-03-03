@@ -1,6 +1,8 @@
-
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities;
 .login-container {
-    /* Basic styling for the login container */
+    /* Basic styling for the login container 
     max-width: 400px;
     margin: 0 auto;
     padding: 1rem;
@@ -9,7 +11,7 @@
 }
 
 .signup-container {
-    /* Basic styling for the signup container */
+    /* Basic styling for the signup container 
     max-width: 500px;
     margin: 0 auto;
     padding: 1rem;
@@ -31,4 +33,4 @@ input {
 button {
     padding: 0.5rem 1rem;
     cursor:pointer;
-}
+} */
