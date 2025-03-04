@@ -1,14 +1,13 @@
 import React from 'react';
-import { Avatar } from '@material-ui/core';
+// import { Avatar } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import './styles.css';
 
 const Homepage = () => {
     return (
         <div className="homepage">
             <header className="titlebar">
                 <h1>CollegeConnect</h1>
-                <Avatar className="avatar" alt="Profile" /*src="/path/to/avatar.jpg"*/ />
+                {/* <Avatar className="avatar" alt="Profile" /*src="/path/to/avatar.jpg"*/ /> */}
             </header>
             <div className='card-container'>
                 {/*Letter Drafting Card*/}
