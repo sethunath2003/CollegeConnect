@@ -21,7 +21,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://your-django-api-endpoint/signup/",
+        "http://192.168.1.5:8000/signup/",
         form
       );
       console.log(response.data);
