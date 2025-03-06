@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import Login from "./Login";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
-  const [form, setForm] = useState({
-    name: "",
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
     email: "",
     password: "",
+    password2: "", // Confirmation password
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
     });
   };
@@ -21,67 +22,73 @@ const Signup = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://192.168.1.5:8000/signup/",
-        form
+        "http://192.168.1.5:8000/accounts/register/",
+        formData
       );
       console.log(response.data);
+
+      if (response.status === 201) {
+        navigate("/login");
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Signup failed", error);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
-      <form
-        className="w-full max-w-md bg-white rounded-lg shadow-md p-8"
-        onSubmit={handleSubmit}
-      >
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Email ID:</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 mb-2">Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Sign Up
-        </button>
-      </form>
-      <p className="mt-4 text-gray-700">
-        Already have an account?{" "}
-        <Link to="/login" className="text-blue-500 hover:underline">
-          Login
-        </Link>
-      </p>
+    <div className="auth-container">
+      <div className="auth-form-container signup-form-container">
+        <h2 className="auth-heading">Sign Up</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Username:</label>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Email:</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Password:</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Confirm Password:</label>
+            <input
+              type="password"
+              name="password2"
+              value={formData.password2}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <button type="submit" className="auth-button">
+            Sign Up
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

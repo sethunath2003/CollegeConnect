@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "", // Changed from email to username to match backend
+    email: "",
     password: "",
   });
 
@@ -34,43 +34,40 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="auth-container">
+      <div className="auth-form-container login-form-container">
+        <h2 className="auth-heading">Login</h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Username:</label>
+          <div className="form-group">
+            <label className="form-label">Username:</label>
             <input
               type="text"
               name="email"
-              value={formData.email} 
+              value={formData.email}
               onChange={handleChange}
               required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Password:</label>
+          <div className="form-group">
+            <label className="form-label">Password:</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
-          >
+          <button type="submit" className="auth-button">
             Login
           </button>
         </form>
-        <div className="mt-4 text-center">
-          <p className="text-gray-700">
+        <div className="form-footer">
+          <p>
             Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-500 hover:underline">
+            <Link to="/signup" className="form-link">
               Sign Up
             </Link>
           </p>
