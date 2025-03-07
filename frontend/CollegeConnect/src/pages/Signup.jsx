@@ -22,7 +22,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://192.168.1.5:8000/accounts/register/",
+        "http://localhost:8000/api/accounts/register/",
         formData
       );
       console.log(response.data);
@@ -32,6 +32,7 @@ const Signup = () => {
       }
     } catch (error) {
       console.error("Signup failed", error);
+      console.log("Error Response Data:", error.response.data);
     }
   };
 

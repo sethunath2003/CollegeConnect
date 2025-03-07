@@ -373,3 +373,248 @@ img {
 .letter-card-purple {
   background-color: #f5f3ff;
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 3px solid #2563eb; /* Blue border */
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: modalFade 0.3s ease-out;
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #1a202c;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+}
+
+.modal-description {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  color: #4a5568;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.modal-close {
+  padding: 0.5rem 1rem;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-close:hover {
+  background-color: #cbd5e0;
+}
+
+.modal-login {
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-login:hover {
+  background-color: #1d4ed8;
+}
+
+.info-button {
+  background-color: #4a5568;
+}
+
+.info-button:hover {
+  background-color: #2d3748;
+}
+
+/* Loading Animation Styles */
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #1a202c;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-text {
+  color: white;
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  font-weight: 500;
+}
+
+.pl {
+  position: relative;
+  width: 9em;
+  height: 12em;
+}
+.pl:before,
+.pl:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  width: inherit;
+  height: 12em;
+}
+.pl:before {
+  animation: top calc(var(--pl-dur) / 2) linear infinite,
+    flipZ var(--pl-dur) steps(1) infinite;
+  border-radius: 4.5em 0 0 0 / 4em 0 0 0;
+  box-shadow: 0 4em 0 0 inset;
+  top: 0;
+}
+.pl:after {
+  animation: bottom calc(var(--pl-dur) / 2) linear infinite;
+  animation-delay: calc(var(--pl-dur) * -0.25);
+  border-radius: 0 0 0 4.5em / 0 0 0 4em;
+  box-shadow: 0 -4em 0 0 #3b82f6 inset;
+  bottom: 0;
+}
+.pl__sr {
+  clip: rect(1px, 1px, 1px, 1px);
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+}
+
+:root {
+  --hue: 223;
+  --bg: hsl(var(--hue), 10%, 90%);
+  --fg: hsl(var(--hue), 10%, 10%);
+  --primary: #3b82f6;
+  --trans-dur: 0.3s;
+  --pl-dur: 2.6s;
+}
+
+/* Animations */
+@keyframes top {
+  from {
+    animation-timing-function: ease-in;
+    clip-path: polygon(
+      0 0,
+      123% 0,
+      123% 70%,
+      123% 70%,
+      123% 0,
+      123% 0,
+      123% 100%,
+      0 100%
+    );
+  }
+  50% {
+    animation-timing-function: ease-out;
+    clip-path: polygon(
+      0 0,
+      0 0,
+      0 70%,
+      77% 70%,
+      77% 0,
+      100% 0,
+      100% 100%,
+      0 100%
+    );
+  }
+  to {
+    clip-path: polygon(0 0, 0 0, 0 70%, 0 70%, 0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+@keyframes bottom {
+  from {
+    animation-timing-function: ease-in;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 30%,
+      0 30%,
+      0 100%,
+      0 100%
+    );
+  }
+  50% {
+    animation-timing-function: ease-out;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      77% 100%,
+      77% 30%,
+      0 30%,
+      0 100%,
+      0 100%
+    );
+  }
+  to {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      123% 100%,
+      123% 30%,
+      100% 30%,
+      100% 100%,
+      0 100%
+    );
+  }
+}
+@keyframes flipZ {
+  from {
+    z-index: 0;
+  }
+  50%,
+  to {
+    z-index: 1;
+  }
+}

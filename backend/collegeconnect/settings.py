@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'authapp',
+    "corsheaders",
+    "accounts"
 ]
 
 MIDDLEWARE = [
@@ -77,12 +78,12 @@ WSGI_APPLICATION = 'collegeconnect.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-         "USER": "root",
-        "PASSWORD": "Root12345",
-        "HOST": "localhost",
-        "PORT": "3306",
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mini_project',  # Replace with your database name
+        'USER': 'root',  # Or your MySQL user
+        'PASSWORD': 'Root@1234',  # Or your MySQL password
+        'HOST': 'localhost',  # Or your MySQL host
+        'PORT': '3306',  # Or your MySQL port (usually 3306)
     }
 }
 
@@ -127,6 +128,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# Or keep your specific origins:
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Allow React frontend
+    "http://localhost:3000",
+    "http://localhost:5173",  # Add Vite's default port
 ]

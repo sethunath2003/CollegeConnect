@@ -69,3 +69,4 @@ def user_login(request):
     
     # If the request method is not POST, return a JSON error response with status 405 (Method Not Allowed).
     return JsonResponse({"error": "Only POST method allowed."}, status=405)
+    
