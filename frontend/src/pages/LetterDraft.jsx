@@ -5,6 +5,48 @@ const LetterDraft = () => {
   const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
+  const submitLetterData=async  (formData,templateType) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/letters/generate/", 
+        {
+          template: templateType,
+          data: formData
+        },
+        {
+          responseType: "blob",
+        }
+      );
+      //Create a Url for the blob
+      const file = new Blob([response.data], { type: "application/pdf" });
+      const fileURL = URL.createObjectURL(file);
+      //Open the file in a new tab
+      window.open(fileURL);
+    } catch (error) {
+      console.error("Failed to Generate PDF:",error);
+    }
+  };
+  const saveDraft = async (formData, letterType) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/letters/save/",
+        {
+          letter_type: letterType,
+          data: formData
+        },
+        {
+          headers:{
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
+
+      if(response.status === 201){
+        alert("Draft saved successfully!");
+      }
+    }
+    catch (error) {
+      console.error("Failed to save draft:", error);
+    }
+  };
   // Function to handle template selection
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
@@ -26,7 +68,7 @@ const LetterDraft = () => {
             </h2>
 
             {/* Application Letter */}
-            <div className="bg-blue-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
+            {/* <div className="bg-blue-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
               <h3 className="text-lg font-semibold text-blue-700 mb-2">
                 Application Letter
               </h3>
@@ -40,7 +82,7 @@ const LetterDraft = () => {
               >
                 Get Started
               </button>
-            </div>
+            </div> */}
 
             {/* Internship Letter */}
             <div className="bg-green-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
@@ -60,7 +102,7 @@ const LetterDraft = () => {
             </div>
 
             {/* Recommendation Letter */}
-            <div className="bg-purple-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
+            {/* <div className="bg-purple-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
               <h3 className="text-lg font-semibold text-purple-700 mb-2">
                 Recommendation Request
               </h3>
@@ -74,7 +116,7 @@ const LetterDraft = () => {
               >
                 Get Started
               </button>
-            </div>
+            </div> */}
 
             {/* Leave Application */}
             <div className="bg-yellow-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
@@ -109,7 +151,7 @@ const LetterDraft = () => {
             </div>
 
             {/* Custom Letter */}
-            <div className="bg-gray-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
+            {/* <div className="bg-gray-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
               <h3 className="text-lg font-semibold text-gray-700 mb-2">
                 Custom Letter
               </h3>
@@ -122,7 +164,7 @@ const LetterDraft = () => {
               >
                 Get Started
               </button>
-            </div>
+            </div> */}
           </div>
         ) : (
           <div className="bg-gray-50 p-6 rounded-lg">

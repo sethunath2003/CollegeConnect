@@ -1,0 +1,26 @@
+
+{yourName}
+{yourAddress}
+{yourCityStateZip}
+{yourEmail}
+{yourPhoneNumber}
+
+{Date}
+
+Scholarship Committee
+{scholarshipProvider}
+{address}
+{cityStateZip}
+
+Subject: Application for {scholarshipName}
+
+Dear {recipientName},
+
+I am writing to apply for the {scholarshipName} at {collegeName}. I am currently a {yourOfStudy} student pursuing {yourMajor} at {collegeName}. This scholarship would greatly assist me in continuing my education and achieving my academic goals.
+
+I have maintained strong academic performance with a GPA of {yourGPA} and actively participated in {extracurricularActivities}. However, financial constraints make it difficult for me to continue my studies without assistance.
+
+Enclosed are the required documents, including {attachedDocuments}. I appreciate your time and consideration and look forward to your positive response.
+
+Sincerely,
+{yourName}
