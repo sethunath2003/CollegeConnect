@@ -60,40 +60,43 @@ const Login = () => {
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-form-container login-form-container">
-        <h2 className="auth-heading">Login</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Username:</label>
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 mb-2">Username:</label>
             <input
               type="text"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="form-input"
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Password:</label>
+          <div>
+            <label className="block text-gray-700 mb-2">Password:</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              className="form-input"
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <button type="submit" className="auth-button">
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors"
+          >
             Login
           </button>
         </form>
-        <div className="form-footer">
-          <p>
+        <div className="mt-4 text-center">
+          <p className="text-gray-700">
             Don't have an account?{" "}
-            <Link to="/signup" className="form-link">
+            <Link to="/signup" className="text-blue-500 hover:underline">
               Sign Up
             </Link>
           </p>

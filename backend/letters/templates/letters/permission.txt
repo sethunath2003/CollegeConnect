@@ -1,0 +1,23 @@
+{yourName}
+{yourSemester},{yourDepartment}
+Saintgits College of Engineering
+
+{Date}
+
+Head of Department
+{yourDepartment}
+Saintgits College of Engineering
+
+Sub: Permission to attend {eventName} held at {eventVenue}
+
+Respected Sir,
+        I am writing to request your permission for to attend the {eventName} event  held at {eventVenue} on {eventDate}.{eventDescription}
+        
+        In this regard,I kindly request duty leave and permission for the following students invvolved in the event.
+        {yourName}({yourRollno},{yourDepartment})
+        {studentDetails}
+
+Thanking You
+Yours Faithfully
+{yourName}
+

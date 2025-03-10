@@ -1,0 +1,18 @@
+{yourName}
+{yourSemester},{yourDepartment}
+Saintgits College of Engineering
+
+{Date}
+
+Head of Department
+{yourDepartment}
+Saintgits College of Engineering
+
+Sub:Request for Duty Leave
+ 
+ Dear Sir/Ma'am
+    I request you to grant me duty leave for the attached list of students who have attended the {eventName} conducted by {eventHolder} on {eventDate} from {startTime} to {endTime}.
+
+Thanking You
+Yours Faithfully
+{yourName}
