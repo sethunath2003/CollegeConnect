@@ -48,63 +48,8 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 font-sans">
-      <header className="bg-gray-900 text-white p-4 flex items-center w-full relative">
-        <div className="absolute left-4">
-          <h2 className="text-3xl font-bold">CollegeConnect</h2>
-        </div>
-
-        <div className="flex mx-auto space-x-4">
-          <button className="px-4 py-2 hover:bg-gray-800 rounded-md">
-            Home
-          </button>
-          <button className="px-4 py-2 hover:bg-gray-800 rounded-md">
-            About
-          </button>
-          <button className="px-4 py-2 hover:bg-gray-800 rounded-md">
-            Services
-          </button>
-          <button className="px-4 py-2 hover:bg-gray-800 rounded-md">
-            Contact
-          </button>
-        </div>
-
-        {isLoggedIn ? (
-          <div className="absolute right-4 flex items-center">
-            <div className="mr-3">
-              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-600">
-                {username.charAt(0).toUpperCase()}
-              </div>
-            </div>
-            <span className="text-white mr-4">{username}</span>
-            <button
-              onClick={() => {
-                localStorage.removeItem("user");
-                setIsLoggedIn(false);
-                setUsername("");
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <div className="absolute right-4 flex">
-            <Link to="/login">
-              <button className="px-5 py-2 bg-gray-700 text-white rounded mr-4 hover:bg-gray-600">
-                Login
-              </button>
-            </Link>
-            <Link to="/signup">
-              <button className="px-5 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">
-                Sign Up
-              </button>
-            </Link>
-          </div>
-        )}
-      </header>
-
-      <main className="flex-grow max-w-7xl mx-auto p-6 md:p-12">
+    <div className="min-h-screen bg-gray-900 flex flex-col">
+      <main className="flex-grow max-w-7xl mx-auto p-6 md:p-12 bg-gray-900">
         <div className="text-center mb-8">
           <h3 className="text-3xl font-bold text-white">
             Welcome to CollegeConnect
@@ -210,40 +155,40 @@ const LandingPage = () => {
             </button>
           </div>
         </div>
-      </main>
 
-      {/* Modal for module information */}
-      {showModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50"
-          onClick={closeModal}
-        >
+        {/* Modal for module information */}
+        {showModal && (
           <div
-            className="bg-white rounded-lg border-3 border-blue-600 p-8 w-11/12 max-w-lg shadow-2xl animate-fade-in"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50"
+            onClick={closeModal}
           >
-            <h3 className="text-xl font-bold mb-4 text-gray-900 text-center border-b border-gray-200 pb-3">
-              {modalContent.title}
-            </h3>
-            <p className="mb-6 text-gray-600 leading-relaxed">
-              {modalContent.description}
-            </p>
-            <div className="flex justify-between border-t border-gray-200 pt-4">
-              <button
-                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
-                onClick={closeModal}
-              >
-                Close
-              </button>
-              <Link to="/login">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                  Login to Access
+            <div
+              className="bg-white rounded-lg border-3 border-blue-600 p-8 w-11/12 max-w-lg shadow-2xl animate-fade-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold mb-4 text-gray-900 text-center border-b border-gray-200 pb-3">
+                {modalContent.title}
+              </h3>
+              <p className="mb-6 text-gray-600 leading-relaxed">
+                {modalContent.description}
+              </p>
+              <div className="flex justify-between border-t border-gray-200 pt-4">
+                <button
+                  className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
+                  onClick={closeModal}
+                >
+                  Close
                 </button>
-              </Link>
+                <Link to="/login">
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Login to Access
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
 
       <footer className="bg-gray-900 text-white p-4 text-center">
         <div className="footer-text">

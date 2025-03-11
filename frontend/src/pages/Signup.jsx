@@ -68,20 +68,19 @@ const Signup = () => {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         if (error.response.data) {
-            // Check if the error response contains specific error messages
-            if (error.response.data.username) {
-                errorMessage = `Username: ${error.response.data.username[0]}`; // Get the first error message
-            } else if (error.response.data.email) {
-                 errorMessage = `Email: ${error.response.data.email[0]}`;
-            } else if (error.response.data.password) {
-                errorMessage = `Password: ${error.response.data.password[0]}`
-            }
-            else {
-                //If the response has data but no specific keys, stringify the whole thing.
-                 errorMessage = JSON.stringify(error.response.data);
-            }
+          // Check if the error response contains specific error messages
+          if (error.response.data.username) {
+            errorMessage = `Username: ${error.response.data.username[0]}`; // Get the first error message
+          } else if (error.response.data.email) {
+            errorMessage = `Email: ${error.response.data.email[0]}`;
+          } else if (error.response.data.password) {
+            errorMessage = `Password: ${error.response.data.password[0]}`;
+          } else {
+            //If the response has data but no specific keys, stringify the whole thing.
+            errorMessage = JSON.stringify(error.response.data);
+          }
         } else {
-           errorMessage = `Error: ${error.response.status} - ${error.response.statusText}`
+          errorMessage = `Error: ${error.response.status} - ${error.response.statusText}`;
         }
       } else if (error.request) {
         // The request was made but no response was received
@@ -104,25 +103,33 @@ const Signup = () => {
     }, 2500); // Hide after 5 seconds
   };
 
-  const hidePopup = () => { // Added a hide function to make the x button work
-      setPopup({ ...popup, show: false});
-  }
+  const hidePopup = () => {
+    // Added a hide function to make the x button work
+    setPopup({ ...popup, show: false });
+  };
 
   if (loading) {
     return <LoadingScreen message="Signing up..." />; // More relevant message
   }
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-[80vh] p-4">
       {/* Popup Container */}
       {popup.show && (
         <div
           className={`fixed top-5 right-5 p-4 rounded-md shadow-lg transition-opacity duration-300 ${
-            popup.isSuccess ? "bg-green-100 border-green-500 text-green-700" : "bg-red-100 border-red-500 text-red-700"
+            popup.isSuccess
+              ? "bg-green-100 border-green-500 text-green-700"
+              : "bg-red-100 border-red-500 text-red-700"
           } border-l-4`}
           style={{ zIndex: 1000 }} // Ensure it's above other elements
         >
-           <span className="absolute top-0 right-0 px-2 py-1 cursor-pointer" onClick={hidePopup}>×</span>
+          <span
+            className="absolute top-0 right-0 px-2 py-1 cursor-pointer"
+            onClick={hidePopup}
+          >
+            ×
+          </span>
           {popup.message}
         </div>
       )}
@@ -163,8 +170,12 @@ const Signup = () => {
             >
               <option value="">Select Department</option>
               <option value="CSE">Computer Science and Engineering</option>
-              <option value="ECE">Electronics and Communication Engineering</option>
-              <option value="EEE">Electronics and Electrical Engineering</option>
+              <option value="ECE">
+                Electronics and Communication Engineering
+              </option>
+              <option value="EEE">
+                Electronics and Electrical Engineering
+              </option>
               <option value="ME">Mechanical Engineering</option>
               <option value="CE">Civil Engineering</option>
               <option value="RB">Robotics and Automation Engineering</option>
