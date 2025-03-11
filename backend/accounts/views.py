@@ -4,6 +4,15 @@ from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+
+# Helper function to generate tokens
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 # Create your views here.
 
@@ -60,10 +69,14 @@ def login_user(request):
     
     if user is not None:
         login(request, user)
+        # Generate JWT token
+        tokens = get_tokens_for_user(user)
+        
         return Response({
             'message': 'Login successful',
             'user_id': user.id,
-            'username': user.username
+            'username': user.username,
+            'token': tokens['access']  # Return the access token
         }, status=status.HTTP_200_OK)
     
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)

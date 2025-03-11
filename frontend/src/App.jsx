@@ -6,11 +6,12 @@ import Homepage from "./pages/Homepage";
 import LetterDraft from "./pages/LetterDraft";
 import Navbar from "./components/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import BookPost from "./pages/BookPost";
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-gray-100">
+      <div className="min-h-screen flex flex-col bg-gray-900">
         <Navbar />
         <div className="flex-grow">
           <Routes>
@@ -19,10 +20,10 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/homepage" element={<Homepage />} />
             <Route path="/letter-drafting" element={<LetterDraft />} />
-            
+            <Route path="/bookexchange/post" element={<BookPost />} />
           </Routes>
         </div>
-        <footer className="bg-gray-900 text-white p-4 text-center">
+        <footer className="bg-gray-900 text-white p-4 text-center mt-auto">
           <div className="footer-text">
             © {new Date().getFullYear()} College Connect. All rights reserved.
           </div>

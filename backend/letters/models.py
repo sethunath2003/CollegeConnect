@@ -12,7 +12,7 @@ class LetterDraft(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='letter_drafts')
-    letter_type = models.CharField(max_width=20, choices=LETTER_TYPES)
+    letter_type = models.CharField(max_length=20, choices=LETTER_TYPES)
     template_data = models.JSONField()  # Store form data as JSON
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

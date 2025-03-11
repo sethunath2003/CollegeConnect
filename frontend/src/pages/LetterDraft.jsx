@@ -8,11 +8,15 @@ const LetterDraft = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Check if user is logged in
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (!userData) {
+    const token = localStorage.getItem("token");
+
+    if (!userData || !token) {
       navigate("/login");
       return;
     }
@@ -27,6 +31,24 @@ const LetterDraft = () => {
     });
   };
 
+  // Helper function to get authenticated API headers
+  const getAuthHeaders = (options = {}) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("Authentication token not found");
+    }
+
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...options.headers,
+      },
+      ...options,
+    };
+  };
+
+  // Then use it in your API calls
   const submitLetterData = async (templateType) => {
     setLoading(true);
     try {
@@ -38,6 +60,7 @@ const LetterDraft = () => {
         },
         {
           responseType: "blob",
+          // Authorization header removed
         }
       );
 
@@ -57,7 +80,18 @@ const LetterDraft = () => {
 
   const saveDraft = async (letterType) => {
     setLoading(true);
+    setError(null);
+    setSaveSuccess(false);
+
     try {
+      // Get the token from localStorage
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("Authentication token not found. Please log in again.");
+        return;
+      }
+
       const response = await axios.post(
         "http://localhost:8000/api/letters/drafts/save/",
         {
@@ -66,26 +100,48 @@ const LetterDraft = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (response.status === 201) {
-        alert("Draft saved successfully!");
+        setSaveSuccess(true);
+        // Show success message for 3 seconds
+        setTimeout(() => {
+          setSaveSuccess(false);
+        }, 3000);
       }
     } catch (error) {
       console.error("Failed to save draft:", error);
-      alert("Failed to save draft. Please try again.");
+
+      if (error.response) {
+        // The server responded with a status code outside the 2xx range
+        if (error.response.status === 401) {
+          setError("Your session has expired. Please log in again.");
+        } else if (error.response.data?.error) {
+          setError(`Failed to save draft: ${error.response.data.error}`);
+        } else {
+          setError(
+            `Failed to save draft. Server error (${error.response.status}).`
+          );
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError("Failed to save draft. No response from the server.");
+      } else {
+        // Something happened in setting up the request
+        setError(`Failed to save draft: ${error.message}`);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Function to handle template selection
+  // Function to handle template selection (no longer pre-fills data)
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
-    // Reset form data when selecting a new template
+    // Initialize with empty form data instead of user profile data
     setFormData({});
   };
 
@@ -101,11 +157,11 @@ const LetterDraft = () => {
   };
 
   if (loading) {
-    return <LoadingScreen message="Generating letter..." />;
+    return <LoadingScreen message="Processing your request..." />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="flex-grow p-8">
       {/* Main container */}
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
@@ -182,22 +238,38 @@ const LetterDraft = () => {
             </h2>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              {/* Common fields for all letter types */}
-              <div>
-                <label className="block text-gray-700 mb-2">Your Name:</label>
-                <input
-                  type="text"
-                  name="yourName"
-                  value={formData.yourName || ""}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                  required
-                />
-              </div>
-
-              {/* Common fields for each template */}
-              {selectedTemplate === "internship" && (
-                <>
+              {/* User profile information - no longer pre-filled */}
+              <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                <h3 className="text-lg font-medium text-blue-700 mb-3">
+                  Your Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-gray-700 mb-2">
+                      Your Name:
+                    </label>
+                    <input
+                      type="text"
+                      name="yourName"
+                      value={formData.yourName || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">
+                      Your Email:
+                    </label>
+                    <input
+                      type="email"
+                      name="yourEmail"
+                      value={formData.yourEmail || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
                   <div>
                     <label className="block text-gray-700 mb-2">
                       Your Semester:
@@ -225,6 +297,29 @@ const LetterDraft = () => {
                     />
                   </div>
                   <div>
+                    <label className="block text-gray-700 mb-2">
+                      Your Degree:
+                    </label>
+                    <input
+                      type="text"
+                      name="yourDegree"
+                      value={formData.yourDegree || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Template specific fields */}
+              {selectedTemplate === "internship" && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-blue-700 mb-2">
+                    Internship Details
+                  </h3>
+
+                  <div>
                     <label className="block text-gray-700 mb-2">Date:</label>
                     <input
                       type="date"
@@ -250,7 +345,7 @@ const LetterDraft = () => {
                   </div>
                   <div>
                     <label className="block text-gray-700 mb-2">
-                      Position:
+                      Position/Role:
                     </label>
                     <input
                       type="text"
@@ -287,52 +382,19 @@ const LetterDraft = () => {
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Your Degree:
-                    </label>
-                    <input
-                      type="text"
-                      name="yourDegree"
-                      value={formData.yourDegree || ""}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
-                </>
+                </div>
               )}
 
               {selectedTemplate === "dutyleave" && (
-                <>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-blue-700 mb-2">
+                    Duty Leave Details
+                  </h3>
+
                   <div>
                     <label className="block text-gray-700 mb-2">
-                      Your Semester:
+                      Letter Date:
                     </label>
-                    <input
-                      type="text"
-                      name="yourSemester"
-                      value={formData.yourSemester || ""}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Your Department:
-                    </label>
-                    <input
-                      type="text"
-                      name="yourDepartment"
-                      value={formData.yourDepartment || ""}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">Date:</label>
                     <input
                       type="date"
                       name="Date"
@@ -342,6 +404,7 @@ const LetterDraft = () => {
                       required
                     />
                   </div>
+
                   <div>
                     <label className="block text-gray-700 mb-2">
                       Event Name:
@@ -353,11 +416,13 @@ const LetterDraft = () => {
                       onChange={handleInputChange}
                       className="w-full p-2 border border-gray-300 rounded"
                       required
+                      placeholder="e.g. Technical Workshop, Conference, Competition"
                     />
                   </div>
+
                   <div>
                     <label className="block text-gray-700 mb-2">
-                      Event Holder:
+                      Event Organizer/Holder:
                     </label>
                     <input
                       type="text"
@@ -366,8 +431,10 @@ const LetterDraft = () => {
                       onChange={handleInputChange}
                       className="w-full p-2 border border-gray-300 rounded"
                       required
+                      placeholder="e.g. IEEE, Institution Name, Department"
                     />
                   </div>
+
                   <div>
                     <label className="block text-gray-700 mb-2">
                       Event Date:
@@ -381,63 +448,54 @@ const LetterDraft = () => {
                       required
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-700 mb-2">
+                        Start Time:
+                      </label>
+                      <input
+                        type="time"
+                        name="startTime"
+                        value={formData.startTime || ""}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 rounded"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 mb-2">
+                        End Time:
+                      </label>
+                      <input
+                        type="time"
+                        name="endTime"
+                        value={formData.endTime || ""}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 rounded"
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-gray-700 mb-2">
-                      Start Time:
+                      Student Details (other students if applicable):
                     </label>
-                    <input
-                      type="time"
-                      name="startTime"
-                      value={formData.startTime || ""}
+                    <textarea
+                      name="studentDetails"
+                      value={formData.studentDetails || ""}
                       onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
+                      className="w-full p-2 border border-gray-300 rounded h-24"
+                      placeholder="Name (Roll No, Department)"
+                    ></textarea>
                   </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      End Time:
-                    </label>
-                    <input
-                      type="time"
-                      name="endTime"
-                      value={formData.endTime || ""}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
-                </>
+                </div>
               )}
 
               {selectedTemplate === "permission" && (
                 <>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Your Semester:
-                    </label>
-                    <input
-                      type="text"
-                      name="yourSemester"
-                      value={formData.yourSemester || ""}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Your Department:
-                    </label>
-                    <input
-                      type="text"
-                      name="yourDepartment"
-                      value={formData.yourDepartment || ""}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
                   <div>
                     <label className="block text-gray-700 mb-2">Date:</label>
                     <input
@@ -539,19 +597,37 @@ const LetterDraft = () => {
                 </button>
 
                 <div className="space-x-4">
+                  {/* Show error message if there is one */}
+                  {error && (
+                    <div className="text-red-500 text-sm mb-2">{error}</div>
+                  )}
+
+                  {/* Show success message if save was successful */}
+                  {saveSuccess && (
+                    <div className="text-green-500 text-sm mb-2">
+                      Draft saved successfully!
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => saveDraft(selectedTemplate)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ${
+                      loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={loading}
                   >
-                    Save Draft
+                    {loading ? "Saving..." : "Save Draft"}
                   </button>
 
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                    className={`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors ${
+                      loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={loading}
                   >
-                    Generate PDF
+                    {loading ? "Generating..." : "Generate PDF"}
                   </button>
                 </div>
               </div>
