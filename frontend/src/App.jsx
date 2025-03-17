@@ -7,6 +7,11 @@ import LetterDraft from "./pages/LetterDraft";
 import Navbar from "./components/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import BookPost from "./pages/BookPost";
+import LetterDrafts from "./pages/LetterDrafts";
+import EditDraft from "./pages/EditDraft";
+import BookDetail from "./pages/BookDetail";
+import BookList from "./pages/BookList"; // Add this import
+import PostBook from "./components/PostBook"; // Add this import
 
 function App() {
   return (
@@ -20,7 +25,15 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/homepage" element={<Homepage />} />
             <Route path="/letter-drafting" element={<LetterDraft />} />
+            <Route path="/bookexchange" element={<BookList />} />{" "}
+            {/* Add this route */}
             <Route path="/bookexchange/post" element={<BookPost />} />
+            <Route path="/letter-draft" element={<LetterDraft />} />
+            <Route path="/drafts" element={<LetterDrafts />} />
+            <Route path="/edit-draft/:draftId" element={<EditDraft />} />
+            <Route path="/books/:id" element={<BookDetail />} />
+            <Route path="/post-book" element={<PostBook />} />{" "}
+            {/* Add this route */}
           </Routes>
         </div>
         <footer className="bg-gray-900 text-white p-4 text-center mt-auto">

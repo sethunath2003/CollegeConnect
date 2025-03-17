@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../components/LoadingScreen";
 
-const LetterDraft = () => {
+const LetterDraft = ({ editMode = false, draftData = null }) => {
   const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formData, setFormData] = useState({});
@@ -15,17 +15,13 @@ const LetterDraft = () => {
     filename: null,
   });
   const [pdfSuccess, setPdfSuccess] = useState(false);
+  const [draftId, setDraftId] = useState(
+    editMode && draftData ? draftData.id : null
+  );
 
-  // Check if user is logged in
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-
-    if (!userData || !token) {
-      navigate("/login");
-      return;
-    }
-  }, [navigate]);
+  // No need to check for authentication anymore
+  // Just initialize any necessary state
+  useEffect(() => {}, [navigate]);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -34,23 +30,6 @@ const LetterDraft = () => {
       ...formData,
       [name]: value,
     });
-  };
-
-  // Helper function to get authenticated API headers
-  const getAuthHeaders = (options = {}) => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      throw new Error("Authentication token not found");
-    }
-
-    return {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...options.headers,
-      },
-      ...options,
-    };
   };
 
   // Then use it in your API calls
@@ -110,34 +89,32 @@ const LetterDraft = () => {
     }
   };
 
+  // Replace the saveDraft function with this version
   const saveDraft = async (letterType) => {
     setLoading(true);
     setError(null);
     setSaveSuccess(false);
 
     try {
-      // Get the token from localStorage
-      const token = localStorage.getItem("token");
+      // If we have a draftId, update the existing draft
+      const endpoint = draftId
+        ? `http://localhost:8000/api/letters/drafts/${draftId}/`
+        : "http://localhost:8000/api/letters/drafts/save/";
 
-      if (!token) {
-        setError("Authentication token not found. Please log in again.");
-        return;
-      }
+      const method = draftId ? "put" : "post";
 
-      const response = await axios.post(
-        "http://localhost:8000/api/letters/drafts/save/",
-        {
-          letter_type: letterType,
-          template_data: formData,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      // Removed token requirement
+      const response = await axios[method](endpoint, {
+        letter_type: letterType,
+        template_data: formData,
+      });
+
+      if (response.status === 201 || response.status === 200) {
+        // If this was a new draft, store the ID for future updates
+        if (response.data.id) {
+          setDraftId(response.data.id);
         }
-      );
 
-      if (response.status === 201) {
         setSaveSuccess(true);
         // Show success message for 3 seconds
         setTimeout(() => {
@@ -150,7 +127,7 @@ const LetterDraft = () => {
       if (error.response) {
         // The server responded with a status code outside the 2xx range
         if (error.response.status === 401) {
-          setError("Your session has expired. Please log in again.");
+          setError("Failed to save draft. Please try again.");
         } else if (error.response.data?.error) {
           setError(`Failed to save draft: ${error.response.data.error}`);
         } else {
@@ -187,6 +164,16 @@ const LetterDraft = () => {
     e.preventDefault();
     submitLetterData(selectedTemplate);
   };
+
+  // Update your useEffect to handle edit mode
+  useEffect(() => {
+    // Check if in edit mode and we have draft data
+    if (editMode && draftData) {
+      setSelectedTemplate(draftData.letter_type);
+      setFormData(draftData.template_data);
+      setDraftId(draftData.id);
+    }
+  }, [editMode, draftData]);
 
   if (loading) {
     return <LoadingScreen message="Processing your request..." />;
@@ -253,6 +240,22 @@ const LetterDraft = () => {
                 className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors w-full"
               >
                 Get Started
+              </button>
+            </div>
+
+            {/* Add this button at the end */}
+            <div className="bg-blue-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
+              <h3 className="text-lg font-semibold text-blue-700 mb-2">
+                My Saved Drafts
+              </h3>
+              <p className="text-gray-600 mb-4">
+                View and edit your previously saved letter drafts.
+              </p>
+              <button
+                onClick={() => navigate("/drafts")}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors w-full"
+              >
+                View Drafts
               </button>
             </div>
           </div>

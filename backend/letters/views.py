@@ -19,7 +19,6 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def save_letter_draft(request):
     try:
         letter_type = request.data.get('letter_type')
@@ -28,8 +27,9 @@ def save_letter_draft(request):
         if not letter_type or not template_data:
             return Response({'error': 'Missing letter type or template data'}, status=400)
         
+        # Create anonymous draft
         draft = LetterDraft.objects.create(
-            user=request.user,
+            user_id=1,  # Use a default anonymous user (you need to create this user in the database)
             letter_type=letter_type,
             template_data=template_data
         )
@@ -37,7 +37,8 @@ def save_letter_draft(request):
         return Response({
             'status': 'success',
             'message': 'Draft saved successfully',
-            'draft_id': draft.id
+            'draft_id': draft.id,
+            'id': draft.id
         }, status=201)
     except Exception as e:
         return Response({'error': str(e)}, status=500)
@@ -218,9 +219,9 @@ def generate_pdf_letter(template_type, data):
     return buffer
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_letter_drafts(request):
-    drafts = LetterDraft.objects.filter(user=request.user).order_by('-updated_at')
+    # Return all drafts (no user filter)
+    drafts = LetterDraft.objects.all().order_by('-updated_at')[:20]  # Limit to 20 most recent
     drafts_data = []
     
     for draft in drafts:
@@ -233,5 +234,62 @@ def get_letter_drafts(request):
         })
     
     return Response({'drafts': drafts_data})
+
+# Add these new views
+
+@api_view(['GET'])
+def list_letter_drafts(request):
+    """List all drafts"""
+    drafts = LetterDraft.objects.all().order_by('-created_at')[:20]
+    # Create a simple serialization since we don't have the serializer module
+    drafts_data = []
+    for draft in drafts:
+        drafts_data.append({
+            'id': draft.id,
+            'letter_type': draft.letter_type,
+            'template_data': draft.template_data,
+            'created_at': draft.created_at.isoformat(),
+            'updated_at': draft.updated_at.isoformat()
+        })
+    return Response(drafts_data)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def manage_letter_draft(request, draft_id):
+    """Get, update or delete a specific draft"""
+    try:
+        draft = LetterDraft.objects.get(id=draft_id)
+    except LetterDraft.DoesNotExist:
+        return Response({'error': 'Draft not found'}, status=404)
+    
+    if request.method == 'GET':
+        data = {
+            'id': draft.id,
+            'letter_type': draft.letter_type,
+            'template_data': draft.template_data,
+            'created_at': draft.created_at.isoformat(),
+            'updated_at': draft.updated_at.isoformat()
+        }
+        return Response(data)
+    
+    elif request.method == 'PUT':
+        letter_type = request.data.get('letter_type')
+        template_data = request.data.get('template_data')
+        
+        if not letter_type or not template_data:
+            return Response({'error': 'Missing letter type or template data'}, status=400)
+            
+        draft.letter_type = letter_type
+        draft.template_data = template_data
+        draft.save()
+        
+        return Response({
+            'status': 'success',
+            'message': 'Draft updated successfully',
+            'id': draft.id
+        })
+    
+    elif request.method == 'DELETE':
+        draft.delete()
+        return Response(status=204)
 
 
