@@ -10,8 +10,25 @@ const BookList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // New state for booking
+  const [bookingBookId, setBookingBookId] = useState(null);
+  const [bookingFormData, setBookingFormData] = useState({
+    booker_name: "",
+    booker_email: "",
+  });
+  const [bookingError, setBookingError] = useState("");
+
   // Placeholder image as base64 or URL to avoid the import issue
   const defaultBookCover = "https://placehold.co/400x600";
+
+  // Helper to build the full image URL
+  const getBookImageUrl = (image) => {
+    if (!image) return defaultBookCover;
+    // Ensure that there's a slash between the base URL and the relative path
+    return image.startsWith("http")
+      ? image
+      : `http://localhost:8000/${image.replace(/^\//, "")}`;
+  };
 
   // Fetch books when component mounts
   useEffect(() => {
@@ -34,9 +51,39 @@ const BookList = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Filter books based on search query (client-side filtering for now)
-    // In a real app, you might want to make an API call instead
     console.log("Searching for:", searchQuery);
+  };
+
+  const submitBooking = async (bookId) => {
+    // Basic validation
+    if (!bookingFormData.booker_name || !bookingFormData.booker_email) {
+      setBookingError("Both name and email are required");
+      return;
+    }
+    try {
+      await axios.post(
+        `http://localhost:8000/api/books/${bookId}/select_book/`,
+        bookingFormData
+      );
+      // Update the booked book in local state
+      setBooks(
+        books.map((book) =>
+          book.id === bookId
+            ? {
+                ...book,
+                booker_name: bookingFormData.booker_name,
+                booker_email: bookingFormData.booker_email,
+              }
+            : book
+        )
+      );
+      setBookingBookId(null);
+      setBookingFormData({ booker_name: "", booker_email: "" });
+      setBookingError("");
+    } catch (err) {
+      console.error("Booking error:", err);
+      setBookingError("Booking failed. Please try again.");
+    }
   };
 
   if (loading) {
@@ -87,11 +134,18 @@ const BookList = () => {
             books.map((book) => (
               <div
                 key={book.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
+                className={`relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all ${
+                  book.booker_name ? "opacity-50" : ""
+                }`}
               >
+                {book.booker_name && (
+                  <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-xs font-bold transform rotate-45 translate-y-[-50%] translate-x-[50%]">
+                    Booked
+                  </div>
+                )}
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img
-                    src={book.image || defaultBookCover}
+                    src={getBookImageUrl(book.image)}
                     alt={book.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -113,12 +167,65 @@ const BookList = () => {
                   <p className="text-sm text-gray-600 mb-4">
                     Location: {book.location}
                   </p>
-                  <Link
-                    to={`/books/${book.id}`}
-                    className="block text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    View Details
-                  </Link>
+                  {!book.booker_name &&
+                    (bookingBookId === book.id ? (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Your Name"
+                          className="w-full p-2 border border-gray-300 rounded"
+                          value={bookingFormData.booker_name}
+                          onChange={(e) =>
+                            setBookingFormData({
+                              ...bookingFormData,
+                              booker_name: e.target.value,
+                            })
+                          }
+                        />
+                        <input
+                          type="email"
+                          placeholder="Your Email"
+                          className="w-full p-2 border border-gray-300 rounded"
+                          value={bookingFormData.booker_email}
+                          onChange={(e) =>
+                            setBookingFormData({
+                              ...bookingFormData,
+                              booker_email: e.target.value,
+                            })
+                          }
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => submitBooking(book.id)}
+                            className="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                          >
+                            Submit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setBookingBookId(null);
+                              setBookingError("");
+                            }}
+                            className="flex-1 bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                        {bookingError && (
+                          <p className="text-red-500 text-sm">{bookingError}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setBookingBookId(book.id);
+                          setBookingFormData({ booker_name: "", booker_email: "" });
+                        }}
+                        className="block w-full text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                      >
+                        Book Now
+                      </button>
+                    ))}
                 </div>
               </div>
             ))
@@ -139,38 +246,6 @@ const BookList = () => {
             </div>
           )}
         </div>
-
-        {/* Display placeholder books for demonstration */}
-        {books.length === 0 && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div
-                key={item}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
-              >
-                <div className="h-48 bg-gray-200"></div>
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    Example Book Title
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2">Posted by: User</p>
-                  <p className="text-lg font-bold text-green-600 mb-2">
-                    $15.99
-                  </p>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Location: Main Campus
-                  </p>
-                  <button
-                    onClick={() => navigate("/login")}
-                    className="block w-full text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    Login to View
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
