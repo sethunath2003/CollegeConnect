@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../components/LoadingScreen";
-import defaultBookCover from "../assets/default-book.jpg"; // You may need to add this image
 
 const BookList = () => {
   const navigate = useNavigate();
@@ -10,6 +9,9 @@ const BookList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Placeholder image as base64 or URL to avoid the import issue
+  const defaultBookCover = "https://placehold.co/400x600";
 
   // Fetch books when component mounts
   useEffect(() => {

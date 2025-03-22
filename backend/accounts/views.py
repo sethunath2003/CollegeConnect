@@ -8,38 +8,60 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # Helper function to generate tokens
 def get_tokens_for_user(user):
+    """
+    Generate JWT tokens for a user.
+    
+    Args:
+        user: User object for which to generate tokens
+        
+    Returns:
+        dict: Dictionary containing refresh and access tokens
+    """
     refresh = RefreshToken.for_user(user)
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
 
-# Create your views here.
-
 @api_view(['POST'])
 def register_user(request):
-    """Register a new user and save to database"""
+    """
+    Register a new user and save to database.
+    
+    Validates input data, checks for duplicate username/email,
+    and creates a new user if validation passes.
+    
+    Expected request data:
+        - username: User's username
+        - email: User's email
+        - password: User's password
+        - password2: Password confirmation
+        
+    Returns:
+        - Success response with user details or error message
+    """
     data = request.data
     
-    # Validate data
+    # Validate password match
     if data['password'] != data['password2']:
         return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
     
-    # Check if username exists
+    # Check if username already exists
     if User.objects.filter(username=data['username']).exists():
         return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
-    # Check if email exists
+    # Check if email already exists
     if User.objects.filter(email=data['email']).exists():
         return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
-    # Create user
+    # Create new user
     user = User.objects.create_user(
         username=data['username'],
         email=data['email'],
         password=data['password']
     )
     
+    # Return success response with user details
     return Response({
         'message': 'User created successfully',
         'user_id': user.id,

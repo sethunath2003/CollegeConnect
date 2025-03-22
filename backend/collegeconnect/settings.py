@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "letters",
+    "books",
     'rest_framework',
     'rest_framework_simplejwt',
 ]
@@ -162,3 +163,6 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
+
+# Add this to your settings.py
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']

@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/letters/', include('letters.urls')),
+    path('api/books/', include('books.urls'))
     # Add other app URLs here
 ]
 

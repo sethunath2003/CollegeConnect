@@ -13,7 +13,7 @@ const BookPost = () => {
     location: "",
     cost: "",
     image: null,
-    owner_name: "", // Added from the new component
+    owner_name: "",
   });
 
   // Check if user is logged in
@@ -28,10 +28,10 @@ const BookPost = () => {
     const user = JSON.parse(userData);
     setFormData((prevData) => ({
       ...prevData,
-      owner_name: user.username, // Pre-fill owner name from logged-in user
+      owner_name: user.username,
     }));
 
-    // Show loading screen initially
+    // Show loading animation
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -40,9 +40,9 @@ const BookPost = () => {
   }, [navigate]);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, type, files, value } = e.target;
 
-    if (name === "image" && files.length > 0) {
+    if (type === "file" && files.length > 0) {
       setFormData({
         ...formData,
         [name]: files[0],
@@ -60,7 +60,7 @@ const BookPost = () => {
     setLoading(true);
 
     try {
-      // Create form data for file upload
+      // Create form data for server
       const bookFormData = new FormData();
       bookFormData.append("title", formData.title);
       bookFormData.append("description", formData.description);
@@ -68,36 +68,63 @@ const BookPost = () => {
       bookFormData.append("cost", formData.cost);
       bookFormData.append("owner_name", formData.owner_name);
 
-      if (formData.image) {
+      if (formData.image && formData.image instanceof File) {
         bookFormData.append("image", formData.image);
       }
 
+      // Use axios to post with FormData
       const response = await axios.post(
         "http://localhost:8000/api/books/post/",
         bookFormData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            // No Authorization header
           },
         }
       );
 
-      if (response.status === 201) {
-        setMessage({
-          text: "Book posted successfully!",
-          type: "success",
-        });
+      console.log("Book posted successfully:", response.data);
+      setMessage({
+        text: "Book posted successfully!",
+        type: "success",
+      });
 
-        // Redirect to book list after short delay
-        setTimeout(() => {
-          navigate("/bookexchange");
-        }, 1500);
-      }
+      // Redirect after successful post
+      setTimeout(() => {
+        navigate("/bookexchange");
+      }, 1500);
     } catch (error) {
       console.error("Failed to post book:", error);
+
+      // More detailed error handling
+      let errorMessage = "Failed to post book. Please try again.";
+
+      if (error.response) {
+        // The server responded with an error
+        console.log("Error response data:", error.response.data);
+
+        if (error.response.data && typeof error.response.data === "object") {
+          // Handle validation errors from DRF
+          const errorData = error.response.data;
+          const errorMessages = [];
+
+          for (const field in errorData) {
+            if (Array.isArray(errorData[field])) {
+              errorMessages.push(`${field}: ${errorData[field].join(", ")}`);
+            }
+          }
+
+          if (errorMessages.length > 0) {
+            errorMessage = errorMessages.join("\n");
+          }
+        } else if (error.response.data) {
+          errorMessage = error.response.data;
+        }
+      }
+
       setMessage({
-        text: "Failed to post book. Please try again.",
+        text: errorMessage,
         type: "error",
       });
       setLoading(false);

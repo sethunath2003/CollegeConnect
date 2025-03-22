@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../components/LoadingScreen";
 
-const LetterDraft = ({ editMode = false, draftData = null }) => {
+const LetterDraft = () => {
+  const { draftId } = useParams();
   const navigate = useNavigate();
+  const [savedDraftId, setSavedDraftId] = useState(draftId || null);
+  const [loading, setLoading] = useState(draftId ? true : false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [generatedPDF, setGeneratedPDF] = useState({
@@ -15,13 +17,33 @@ const LetterDraft = ({ editMode = false, draftData = null }) => {
     filename: null,
   });
   const [pdfSuccess, setPdfSuccess] = useState(false);
-  const [draftId, setDraftId] = useState(
-    editMode && draftData ? draftData.id : null
-  );
 
-  // No need to check for authentication anymore
-  // Just initialize any necessary state
-  useEffect(() => {}, [navigate]);
+  // Effect to fetch draft data when editing an existing draft
+  useEffect(() => {
+    // If we have a draftId from URL, fetch that draft
+    if (draftId) {
+      const fetchDraft = async () => {
+        try {
+          setLoading(true);
+          const response = await axios.get(
+            `http://localhost:8000/api/letters/drafts/${draftId}/`
+          );
+
+          // Set the template and form data
+          setSelectedTemplate(response.data.letter_type);
+          setFormData(response.data.template_data);
+          setSavedDraftId(response.data.id);
+        } catch (err) {
+          console.error("Failed to fetch draft:", err);
+          setError("Failed to load your draft. Please try again.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchDraft();
+    }
+  }, [draftId]);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -97,11 +119,11 @@ const LetterDraft = ({ editMode = false, draftData = null }) => {
 
     try {
       // If we have a draftId, update the existing draft
-      const endpoint = draftId
-        ? `http://localhost:8000/api/letters/drafts/${draftId}/`
+      const endpoint = savedDraftId
+        ? `http://localhost:8000/api/letters/drafts/${savedDraftId}/`
         : "http://localhost:8000/api/letters/drafts/save/";
 
-      const method = draftId ? "put" : "post";
+      const method = savedDraftId ? "put" : "post";
 
       // Removed token requirement
       const response = await axios[method](endpoint, {
@@ -112,7 +134,7 @@ const LetterDraft = ({ editMode = false, draftData = null }) => {
       if (response.status === 201 || response.status === 200) {
         // If this was a new draft, store the ID for future updates
         if (response.data.id) {
-          setDraftId(response.data.id);
+          setSavedDraftId(response.data.id);
         }
 
         setSaveSuccess(true);
@@ -165,18 +187,32 @@ const LetterDraft = ({ editMode = false, draftData = null }) => {
     submitLetterData(selectedTemplate);
   };
 
-  // Update your useEffect to handle edit mode
-  useEffect(() => {
-    // Check if in edit mode and we have draft data
-    if (editMode && draftData) {
-      setSelectedTemplate(draftData.letter_type);
-      setFormData(draftData.template_data);
-      setDraftId(draftData.id);
-    }
-  }, [editMode, draftData]);
-
   if (loading) {
-    return <LoadingScreen message="Processing your request..." />;
+    return (
+      <LoadingScreen
+        message={
+          draftId ? "Loading your draft..." : "Processing your request..."
+        }
+      />
+    );
+  }
+
+  if (error && draftId) {
+    return (
+      <div className="flex-grow p-8">
+        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+          <button
+            onClick={() => navigate("/drafts")}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Back to Drafts
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -516,13 +552,64 @@ const LetterDraft = ({ editMode = false, draftData = null }) => {
 
                   <div>
                     <label className="block text-gray-700 mb-2">
+                      Event Venue:
+                    </label>
+                    <input
+                      type="text"
+                      name="eventVenue"
+                      value={formData.eventVenue || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">
+                      Event Date:
+                    </label>
+                    <input
+                      type="date"
+                      name="eventDate"
+                      value={formData.eventDate || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">
+                      Event Description:
+                    </label>
+                    <textarea
+                      name="eventDescription"
+                      value={formData.eventDescription || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded h-32"
+                      required
+                    ></textarea>
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">
+                      Your Roll Number:
+                    </label>
+                    <input
+                      type="text"
+                      name="yourRollno"
+                      value={formData.yourRollno || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">
                       Student Details (other students if applicable):
                     </label>
                     <textarea
                       name="studentDetails"
                       value={formData.studentDetails || ""}
                       onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded h-24"
+                      className="w-full p-2 border border-gray-300 rounded"
                       placeholder="Name (Roll No, Department)"
                     ></textarea>
                   </div>
@@ -550,6 +637,19 @@ const LetterDraft = ({ editMode = false, draftData = null }) => {
                       type="text"
                       name="eventName"
                       value={formData.eventName || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">
+                      Event Organizer:
+                    </label>
+                    <input
+                      type="text"
+                      name="eventHolder"
+                      value={formData.eventHolder || ""}
                       onChange={handleInputChange}
                       className="w-full p-2 border border-gray-300 rounded"
                       required
@@ -634,7 +734,17 @@ const LetterDraft = ({ editMode = false, draftData = null }) => {
                 <div className="space-x-4">
                   {/* Show error message if there is one */}
                   {error && (
-                    <div className="text-red-500 text-sm mb-2">{error}</div>
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                      {error}
+                      <div className="mt-2">
+                        <button
+                          onClick={() => navigate("/drafts")}
+                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        >
+                          Back to Drafts
+                        </button>
+                      </div>
+                    </div>
                   )}
 
                   {/* Show success message if save was successful */}
