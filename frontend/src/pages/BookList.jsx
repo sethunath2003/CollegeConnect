@@ -10,6 +10,7 @@ const BookList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   // New state for booking
   const [bookingBookId, setBookingBookId] = useState(null);
