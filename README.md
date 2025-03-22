@@ -1,2 +1,2 @@
 # CollegeConnect
-THis is the repository for the S6 Mini project 
+This is the repository for the S6 Mini project
