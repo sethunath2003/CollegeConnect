@@ -6,9 +6,11 @@ import LoadingScreen from "../components/LoadingScreen";
 const BookList = () => {
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
+  const [filteredBooks, setFilteredBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   // Placeholder image as base64 or URL to avoid the import issue
   const defaultBookCover = "https://placehold.co/400x600";
@@ -20,6 +22,7 @@ const BookList = () => {
         // This would be your actual API endpoint
         const response = await axios.get("http://localhost:8000/api/books/");
         setBooks(response.data);
+        setFilteredBooks(response.data);
       } catch (err) {
         console.error("Failed to fetch books:", err);
         setError("Failed to load books. Please try again.");
@@ -34,14 +37,40 @@ const BookList = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Filter books based on search query (client-side filtering for now)
-    // In a real app, you might want to make an API call instead
-    console.log("Searching for:", searchQuery);
+
+    // If search query is empty, reset to show all books
+    if (!searchQuery.trim()) {
+      setFilteredBooks(books);
+      setIsSearchActive(false);
+      return;
+    }
+
+    // Filter books based on search query (case-insensitive)
+    const searchResults = books.filter((book) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        (book.title && book.title.toLowerCase().includes(query)) ||
+        (book.description && book.description.toLowerCase().includes(query)) ||
+        (book.owner_name && book.owner_name.toLowerCase().includes(query))
+      );
+    });
+
+    setFilteredBooks(searchResults);
+    setIsSearchActive(true);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setFilteredBooks(books);
+    setIsSearchActive(false);
   };
 
   if (loading) {
     return <LoadingScreen message="Loading available books..." />;
   }
+
+  // Determine which books to display (filtered or all)
+  const displayBooks = filteredBooks;
 
   return (
     <div className="flex-grow p-8 bg-gray-100">
@@ -72,6 +101,15 @@ const BookList = () => {
             >
               Search
             </button>
+            {isSearchActive && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                Clear
+              </button>
+            )}
           </form>
         </div>
 
@@ -81,14 +119,37 @@ const BookList = () => {
           </div>
         )}
 
+        {/* Search Results Info */}
+        {isSearchActive && (
+          <div className="mb-4 text-gray-700">
+            {filteredBooks.length === 0 ? (
+              <p>
+                No results found for "{searchQuery}".{" "}
+                <button
+                  onClick={clearSearch}
+                  className="text-blue-500 underline"
+                >
+                  Show all books
+                </button>
+              </p>
+            ) : (
+              <p>
+                Found {filteredBooks.length} result
+                {filteredBooks.length !== 1 ? "s" : ""} for "{searchQuery}"
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Books Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {books.length > 0 ? (
-            books.map((book) => (
+          {displayBooks.length > 0 ? (
+            displayBooks.map((book) => (
               <div
                 key={book.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
               >
+                {/* Rest of your book card code remains unchanged */}
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img
                     src={book.image || defaultBookCover}
@@ -125,22 +186,38 @@ const BookList = () => {
           ) : (
             <div className="col-span-full bg-white rounded-lg shadow-md p-8 text-center">
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-                No books available yet
+                {isSearchActive
+                  ? "No matching books found"
+                  : "No books available yet"}
               </h2>
               <p className="text-gray-600 mb-6">
-                Be the first to share your books with the community!
+                {isSearchActive ? (
+                  <span>
+                    Try different search terms or{" "}
+                    <button
+                      onClick={clearSearch}
+                      className="text-blue-500 underline"
+                    >
+                      browse all books
+                    </button>
+                  </span>
+                ) : (
+                  "Be the first to share your books with the community!"
+                )}
               </p>
-              <Link
-                to="/bookexchange/post"
-                className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
-              >
-                Post Your Book
-              </Link>
+              {!isSearchActive && (
+                <Link
+                  to="/bookexchange/post"
+                  className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Post Your Book
+                </Link>
+              )}
             </div>
           )}
         </div>
 
-        {/* Display placeholder books for demonstration */}
+        {/* The placeholder books section remains unchanged */}
         {books.length === 0 && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((item) => (
