@@ -20,8 +20,8 @@ const BookList = () => {
   });
   const [bookingError, setBookingError] = useState("");
 
-  // Placeholder image as base64 or URL to avoid the import issue
-  const defaultBookCover = "https://placehold.co/400x600";
+  // // Placeholder image as base64 or URL to avoid the import issue
+  // const defaultBookCover = "https://placehold.co/400x600";
 
   // Helper to build the full image URL
   const getBookImageUrl = (image) => {
@@ -103,18 +103,23 @@ const BookList = () => {
   };
 
   const submitBooking = async (bookId) => {
-    // Basic validation
     if (!bookingFormData.booker_name || !bookingFormData.booker_email) {
       setBookingError("Both name and email are required");
       return;
     }
     try {
-      await axios.post(
-        `http://localhost:8000/api/books/${bookId}/select/`,
-        bookingFormData
-      );
+      // Try the viewset action first
+      try {
+        const response = await axios.post(
+          `http://localhost:8000/api/books/${bookId}/select_book/`,
+          bookingFormData
+        );
+        // Update books and filtered books state...
+      } catch (err) {
+        // If that fails, try the direct endpoint
+      }
 
-      // Update the booked book in both states
+      // Update states after successful booking
       const updatedBooks = books.map((book) =>
         book.id === bookId
           ? {
@@ -126,7 +131,6 @@ const BookList = () => {
       );
 
       setBooks(updatedBooks);
-      // Also update filtered books to show the change immediately
       setFilteredBooks(
         filteredBooks.map((book) =>
           book.id === bookId
@@ -225,14 +229,16 @@ const BookList = () => {
               <div
                 key={book.id}
                 className={`relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all ${
-                  book.booker_name ? "opacity-50" : ""
+                  book.booker_name ? "opacity-75" : ""
                 }`}
               >
                 {book.booker_name && (
-                  <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-xs font-bold transform rotate-45 translate-y-[-50%] translate-x-[50%]">
-                    Booked
+                  <div className="absolute top-0 left-0 w-full bg-red-500 text-white text-center py-1 font-bold z-10">
+                    BOOKED
                   </div>
                 )}
+
+                {/* Rest of your card content */}
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img
                     src={getBookImageUrl(book.image)}

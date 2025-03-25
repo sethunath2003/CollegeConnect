@@ -48,11 +48,12 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # Comment out this line to disable CSRF protection globally
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -87,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mini_project',  # Replace with your database name
         'USER': 'root',  # Or your MySQL user
-        'PASSWORD': 'Root12345',  # Or your MySQL password
+        'PASSWORD': 'Root@1234',  # Or your MySQL password
         'HOST': 'localhost',  # Or your MySQL host
         'PORT': '3306',  # Or your MySQL port (usually 3306)
     }
@@ -135,7 +136,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_CREDENTIALS = True # For development only
 # Or keep your specific origins:
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -144,8 +146,8 @@ CORS_ALLOWED_ORIGINS = [
 
 # Change REST_FRAMEWORK settings to remove authentication requirement
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [],  # Remove authentication classes
-    'DEFAULT_PERMISSION_CLASSES': [],      # Remove permission classes
+    'DEFAULT_AUTHENTICATION_CLASSES': [],  # Empty list removes all authentication classes
+    'DEFAULT_PERMISSION_CLASSES': [],      # Empty list removes all permission requirements
 }
 
 SIMPLE_JWT = {

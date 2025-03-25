@@ -1,26 +1,26 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LandingPage from "./pages/LandingPage";
-import Homepage from "./pages/Homepage";
-import LetterDraft from "./pages/LetterDraft";
 import Layout from "./components/Layout";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import BookPost from "./pages/BookPost";
-import LetterDrafts from "./pages/LetterDrafts";
-import EditDraft from "./pages/EditDraft";
-import BookDetail from "./pages/BookDetail";
-import BookList from "./pages/BookList"; // Add this import
-import PostBook from "./components/PostBook"; // Add this import
 import Services from "./pages/Services";
 import About from "./pages/About";
+import Homepage from "./pages/Homepage";
+import LetterDrafts from "./modules//Letters/LetterDrafts";
+import LetterDraft from "./modules/Letters/LetterDraft";
+import EditDraft from "./modules/Letters/EditDraft";
+import BookPost from "./modules/Books/BookPost";
+import BookDetail from "./modules/Books/BookDetail";
+import BookList from "./modules/Books/BookList"; // Add this import
+import PostBook from "./modules/Books/PostBook"; // Add this import
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-gray-900">
         <Layout />
-        <div >
+        <div>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />

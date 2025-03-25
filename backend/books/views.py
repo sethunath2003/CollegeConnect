@@ -4,14 +4,16 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from .models import Book
 from .forms import BookForm
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import BookSerializer
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
-from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+import json
 
 @api_view(['GET'])
 def index(request):
@@ -81,54 +83,116 @@ def select_book(request, book_id):
     # Render the booking form template
     return render(request, 'books/selectbook.html', {'book': book})
 
+@method_decorator(csrf_exempt, name='dispatch')
 class BookViewSet(viewsets.ModelViewSet):
-    """
-    API viewset for Book model.
-    
-    Provides CRUD operations for books via REST API.
-    """
+    """ViewSet for the Book model."""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    parser_classes = (MultiPartParser, FormParser)  # Allow file uploads
-
-    @csrf_exempt
-    def get_queryset(self):
-        """
-        Custom queryset method to filter books.
-        
-        Shows only available books and handles search functionality.
-        """
-        # Get only available books
-        queryset = Book.objects.filter(booker_name__isnull=True)
-        
-        # Apply search filter if search parameter exists
-        search = self.request.query_params.get('search', None)
-        if search:
-            queryset = queryset.filter(
-                Q(title__icontains=search) |
-                Q(description__icontains=search) |
-                Q(owner_name__icontains=search)
-            )
-        return queryset
-
-    @csrf_exempt
+    permission_classes = [AllowAny]  # This is important!
+    
     @action(detail=True, methods=['post'])
-    def select_book(self, request, **kwargs):
-        """
-        Custom action to select (book) a book via API.
-        
-        Updates the book with booker information.
-        """
-        # Get the book object
-        book = self.get_object()
-        
-        # Update with booker information
-        book.booker_name = request.data.get('booker_name')
-        book.booker_email = request.data.get('booker_email')
-        book.save()
-        
-        # Return success response
-        return Response({'status': 'book selected'})
+    def select_book(self, request, pk=None):
+        """Book a specific book."""
+        try:
+            book = self.get_object()
+            
+            # Check if already booked
+            if book.booker_name:
+                return Response(
+                    {"error": "This book is already booked"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get booking data
+            booker_name = request.data.get('booker_name')
+            booker_email = request.data.get('booker_email')
+            
+            if not booker_name or not booker_email:
+                return Response(
+                    {"error": "Both name and email are required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Update book with booker information
+            book.booker_name = booker_name
+            book.booker_email = booker_email
+            book.save()
+            
+            return Response(BookSerializer(book).data)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+@api_view(['GET'])
+def booked_by_me(request):
+    """
+    View function to display books booked by the authenticated user.
+    
+    Filters books by the current user's email from the authentication system.
+    """
+    # Get email from authenticated user
+    user = request.user
+    
+    if not user.is_authenticated:
+        return Response(
+            {"error": "Authentication required"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    booker_email = user.email
+    
+    if not booker_email:
+        return Response(
+            {"error": "User email not found"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Query books booked by this email
+    books = Book.objects.filter(booker_email=booker_email).order_by('-id')
+    
+    # Serialize the books and return as JSON
+    serializer = BookSerializer(books, many=True)
+    
+    return Response({
+        'count': books.count(),
+        'results': serializer.data
+    })
+
+@api_view(['GET'])
+def posted_by_me(request):
+    """
+    View function to display books posted by a specific user.
+    
+    Filters books by the owner_email provided in the query parameter.
+    """
+    user = request.user
+    
+    if not user.is_authenticated:
+        return Response(
+            {"error": "Authentication required"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    owner_email = user.email
+    
+    if not owner_email:
+        return Response(
+            {"error": "User email not found"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    
+    # Query books posted by this email
+    books = Book.objects.filter(owner_email=owner_email).order_by('-id')
+    
+    # Serialize the books and return as JSON
+    serializer = BookSerializer(books, many=True)
+    
+    return Response({
+        'count': books.count(),
+        'results': serializer.data
+    })
 
 class BookPostView(APIView):
     permission_classes = [AllowAny]  # Allow any user to post

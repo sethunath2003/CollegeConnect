@@ -6,8 +6,8 @@ from .views import BookViewSet
 
 # Set up the DRF router for automatic URL routing
 router = DefaultRouter()
-# Register the BookViewSet with an explicit 'api' endpoint to avoid conflicts
-router.register(r'api', BookViewSet)
+# Register the BookViewSet with 'books' endpoint to match frontend requests
+router.register(r'books', BookViewSet, basename='book')
 
 # Define URL patterns for the books application
 urlpatterns = [
@@ -16,7 +16,13 @@ urlpatterns = [
     # URL for posting/creating a new book
     path('post/', views.BookPostView.as_view(), name='book-post'),
     # URL for selecting/viewing a specific book by ID
-    path('select/<int:book_id>/', views.select_book, name='select_book'),
-    # Include all DRF API routes under the 'api/' prefix
+    # path('select/<int:book_id>/', views.select_book, name='select_book'),
+    path('<int:book_id>/select_book/',views.select_book, name='select_book'),
+    #URL for viewing who booked my materials
+    path('posted_by_me/', views.posted_by_me, name='posted_by_me'),
+    # URL for viewing books booked by the current user
+    path('booked_by_me/', views.booked_by_me, name='booked_by_me'),
+    # Include all DRF API routes
     path('', include(router.urls)),
+    
 ]
