@@ -16,7 +16,7 @@ const BookPost = () => {
     description: "", // Book description
     location: "", // Location for exchange
     cost: "", // Cost of the book
-    image: null, // Book cover image file
+    cover_image: null, // Book cover image file
     owner_name: "", // Name of book owner
   });
 
@@ -78,8 +78,8 @@ const BookPost = () => {
       bookFormData.append("owner_name", formData.owner_name);
 
       // Add image if one was selected
-      if (formData.image && formData.image instanceof File) {
-        bookFormData.append("image", formData.image);
+      if (formData.cover_image && formData.cover_image instanceof File) {
+        bookFormData.append("cover_image", formData.cover_image);
       }
 
       // Send POST request to API
@@ -279,15 +279,15 @@ const BookPost = () => {
         {/* Book cover image upload */}
         <div className="form-group">
           <label
-            htmlFor="image"
+            htmlFor="cover_image"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
             Book Cover Image
           </label>
           <input
             type="file"
-            id="image"
-            name="image"
+            id="cover_image"
+            name="cover_image"
             onChange={handleChange}
             accept="image/*"
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"

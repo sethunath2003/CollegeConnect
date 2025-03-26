@@ -266,15 +266,15 @@ const BookList = () => {
 
                 {/* Book cover image */}
                 <div className="h-48 bg-gray-200 overflow-hidden">
-                  <img
-                    src={getBookImageUrl(book.image)}
-                    alt={book.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = defaultBookCover;
-                    }}
-                  />
+                <img
+  src={getBookImageUrl(book.cover_image)}
+  alt={book.title}
+  className="w-full h-full object-cover"
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src = defaultBookCover;
+  }}
+/>
                 </div>
 
                 {/* Book details */}

@@ -88,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mini_project',  # Replace with your database name
         'USER': 'root',  # Or your MySQL user
-        'PASSWORD': 'Root@1234',  # Or your MySQL password
+        'PASSWORD': 'Root12345',  # Or your MySQL password
         'HOST': 'localhost',  # Or your MySQL host
         'PORT': '3306',  # Or your MySQL port (usually 3306)
     }
