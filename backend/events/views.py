@@ -21,7 +21,7 @@ def run_scraper(request):
     events = []
 
     for card in event_list:
-        event_name_tag = card.find('a', class_='allhackname eventName')
+        event_name_tag = card.find('a', class_='allhackname eventName text-decoration-none')
         image_tag = card.find("img")
         event_description_tag = card.find('div', class_='eventDescription')
         registration_start_tag = card.find_all('div', class_='hackresgiterdate')[0] if len(card.find_all('div', class_='hackresgiterdate')) > 0 else None

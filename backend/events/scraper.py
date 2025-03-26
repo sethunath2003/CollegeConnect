@@ -27,7 +27,7 @@ def scrape_events():
     events = []
     for card in event_list:
         # ✅ Fix: Use lambda for flexible class matching
-        title_tag = card.find("a", class_=lambda x: x and "allhackname" in x)
+        title_tag = card.find("a", class_="allhackname eventName text-decoration-none")
         title = title_tag.text.strip() if title_tag else "No title found"
 
         # ✅ Debugging: Print title to check if it's extracted correctly
