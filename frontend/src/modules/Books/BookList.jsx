@@ -20,8 +20,8 @@ const BookList = () => {
   });
   const [bookingError, setBookingError] = useState("");
 
-  // // Placeholder image as base64 or URL to avoid the import issue
-  // const defaultBookCover = "https://placehold.co/400x600";
+  // Placeholder image as base64 or URL to avoid the import issue
+  const defaultBookCover = "https://placehold.co/400x600";
 
   // Helper to build the full image URL
   const getBookImageUrl = (image) => {
