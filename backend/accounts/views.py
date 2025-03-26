@@ -1,7 +1,9 @@
+import token
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -65,29 +67,33 @@ def register_user(request):
     return Response({
         'message': 'User created successfully',
         'user_id': user.id,
-        'username': user.username
+        'username': user.username,
+        'email': user.email,
+        'token':token['access']
     }, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
+@permission_classes([AllowAny]) 
 def login_user(request):
     """Authenticate a user"""
     data = request.data
     
-    # For your login form, you are using 'email' field but Django's authenticate
-    # uses 'username' by default, so we need to handle both cases
-    username = data.get('username', data.get('email', ''))
+    # Get email and password from request data
+    email = data.get('email', '')
     password = data.get('password', '')
     
-    # Try to authenticate with username
-    user = authenticate(request, username=username, password=password)
+    if not email or not password:
+        return Response({'error': 'Both email and password are required'}, 
+                        status=status.HTTP_400_BAD_REQUEST)
     
-    # If that didn't work, try with email
-    if user is None and '@' in username:
-        try:
-            user_obj = User.objects.get(email=username)
-            user = authenticate(request, username=user_obj.username, password=password)
-        except User.DoesNotExist:
-            pass
+    # First, try to find a user with this email
+    try:
+        user_obj = User.objects.get(email=email)
+        # Then authenticate with username and password
+        user = authenticate(request, username=user_obj.username, password=password)
+    except User.DoesNotExist:
+        # If no user with this email, try authenticating with email as username (fallback)
+        user = authenticate(request, username=email, password=password)
     
     if user is not None:
         login(request, user)
@@ -98,7 +104,9 @@ def login_user(request):
             'message': 'Login successful',
             'user_id': user.id,
             'username': user.username,
-            'token': tokens['access']  # Return the access token
+            'email': user.email,  # Make sure this is included
+            'token': tokens['access']
         }, status=status.HTTP_200_OK)
-    
-    return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return Response({'error': 'Invalid credentials'}, 
+                        status=status.HTTP_401_UNAUTHORIZED)

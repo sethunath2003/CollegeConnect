@@ -140,14 +140,18 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True # For development only
 # Or keep your specific origins:
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:5173",  # Add Vite's default port
+    "http://localhost:5173",  # Vite default port
+    "http://127.0.0.1:5173",
 ]
 
-# Change REST_FRAMEWORK settings to remove authentication requirement
+# Set default authentication and permission policies
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [],  # Empty list removes all authentication classes
-    'DEFAULT_PERMISSION_CLASSES': [],      # Empty list removes all permission requirements
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Set default to allow any
+    ],
 }
 
 SIMPLE_JWT = {

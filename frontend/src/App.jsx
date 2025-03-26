@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LandingPage from "./pages/LandingPage";
@@ -14,8 +15,26 @@ import BookPost from "./modules/Books/BookPost";
 import BookDetail from "./modules/Books/BookDetail";
 import BookList from "./modules/Books/BookList"; // Add this import
 import PostBook from "./modules/Books/PostBook"; // Add this import
+import BookedByMe from "./modules/Books/BookedByMe";
 
 function App() {
+  // Set up axios interceptor for authentication
+  useEffect(() => {
+    const interceptor = axios.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+          config.headers["Authorization"] = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // Cleanup interceptor on component unmount
+    return () => axios.interceptors.request.eject(interceptor);
+  }, []);
+
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-gray-900">
@@ -37,6 +56,7 @@ function App() {
             <Route path="/edit-draft/:draftId" element={<EditDraft />} />
             <Route path="/books/:id" element={<BookDetail />} />
             <Route path="/post-book" element={<PostBook />} />{" "}
+            <Route path="/bookexchange/booked-by-me" element={<BookedByMe />} />
             {/* Add this route */}
           </Routes>
         </div>

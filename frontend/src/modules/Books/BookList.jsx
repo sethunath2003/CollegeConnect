@@ -1,42 +1,61 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Form, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 
 const BookList = () => {
+  // Hook for programmatic navigation
   const navigate = useNavigate();
-  const [books, setBooks] = useState([]);
-  const [filteredBooks, setFilteredBooks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isSearchActive, setIsSearchActive] = useState(false);
 
-  // New state for booking
-  const [bookingBookId, setBookingBookId] = useState(null);
+  // State variables for managing books data and UI
+  const [books, setBooks] = useState([]); // All books from API
+  const [filteredBooks, setFilteredBooks] = useState([]); // Books after filtering/search
+  const [searchQuery, setSearchQuery] = useState(""); // Current search query
+  const [loading, setLoading] = useState(true); // Loading state for initial fetch
+  const [error, setError] = useState(null); // Error state for API calls
+  const [isSearchActive, setIsSearchActive] = useState(false); // Whether search is being used
+
+  // State for booking feature
+  const [bookingBookId, setBookingBookId] = useState(null); // ID of book being booked
   const [bookingFormData, setBookingFormData] = useState({
-    booker_name: "",
-    booker_email: "",
+    booker_name: "", // Name of person booking
+    booker_email: "", // Email of person booking
   });
-  const [bookingError, setBookingError] = useState("");
+  const [bookingError, setBookingError] = useState(""); // Error during booking
+  const [userLoggedIn, setUserLoggedIn] = useState(false); // Login status
 
-  // // Placeholder image as base64 or URL to avoid the import issue
-  // const defaultBookCover = "https://placehold.co/400x600";
+  // Default image for books without cover
+  const defaultBookCover = "https://placehold.co/400x600";
 
-  // Helper to build the full image URL
+  // Helper function to build the full image URL
   const getBookImageUrl = (image) => {
     if (!image) return defaultBookCover;
-    // Ensure that there's a slash between the base URL and the relative path
     return image.startsWith("http")
-      ? image
-      : `http://localhost:8000/${image.replace(/^\//, "")}`;
+      ? image // Use as-is if already a full URL
+      : `http://localhost:8000/${image.replace(/^\//, "")}`; // Otherwise, construct URL
   };
+
+  // Check if user is logged in and get their info
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserLoggedIn(true);
+
+      // Set booking form data with user info
+      setBookingFormData({
+        booker_name: user.username,
+        booker_email: user.email, // No fallback, use exactly what comes from backend
+      });
+    }
+  }, []);
 
   // Fetch books when component mounts
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        // This would be your actual API endpoint
+        // Call the API to get all books
         const response = await axios.get("http://localhost:8000/api/books/");
         setBooks(response.data);
         setFilteredBooks(response.data);
@@ -44,7 +63,7 @@ const BookList = () => {
         console.error("Failed to fetch books:", err);
         setError("Failed to load books. Please try again.");
       } finally {
-        // Simulate a short loading time for better UX
+        // Add a slight delay for better UX
         setTimeout(() => setLoading(false), 1000);
       }
     };
@@ -52,6 +71,7 @@ const BookList = () => {
     fetchBooks();
   }, []);
 
+  // Handle form submission for search
   const handleSearch = (e) => {
     e.preventDefault();
 
@@ -72,12 +92,15 @@ const BookList = () => {
       );
     });
 
+    // Update state with filtered results
     setFilteredBooks(searchResults);
     setIsSearchActive(true);
   };
 
+  // Handle input changes in the search box
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
+    // Real-time filtering as user types
     if (!e.target.value.trim()) {
       setFilteredBooks(books);
       setIsSearchActive(false);
@@ -96,30 +119,29 @@ const BookList = () => {
     }
   };
 
+  // Clear search and show all books
   const clearSearch = () => {
     setSearchQuery("");
     setFilteredBooks(books);
     setIsSearchActive(false);
   };
 
+  // Submit booking request to API
   const submitBooking = async (bookId) => {
-    if (!bookingFormData.booker_name || !bookingFormData.booker_email) {
-      setBookingError("Both name and email are required");
+    // Check if user is logged in before booking
+    if (!userLoggedIn) {
+      navigate("/login");
       return;
     }
-    try {
-      // Try the viewset action first
-      try {
-        const response = await axios.post(
-          `http://localhost:8000/api/books/${bookId}/select_book/`,
-          bookingFormData
-        );
-        // Update books and filtered books state...
-      } catch (err) {
-        // If that fails, try the direct endpoint
-      }
 
-      // Update states after successful booking
+    try {
+      // Call API to book the selected book
+      const response = await axios.post(
+        `http://localhost:8000/api/books/${bookId}/select_book/`,
+        bookingFormData
+      );
+
+      // Update local state to reflect changes
       const updatedBooks = books.map((book) =>
         book.id === bookId
           ? {
@@ -143,15 +165,15 @@ const BookList = () => {
         )
       );
 
+      // Reset booking state
       setBookingBookId(null);
-      setBookingFormData({ booker_name: "", booker_email: "" });
-      setBookingError("");
     } catch (err) {
       console.error("Booking error:", err);
       setBookingError("Booking failed. Please try again.");
     }
   };
 
+  // Show loading screen while data is being fetched
   if (loading) {
     return <LoadingScreen message="Loading available books..." />;
   }
@@ -162,6 +184,7 @@ const BookList = () => {
   return (
     <div className="flex-grow p-8 bg-gray-100">
       <div className="max-w-6xl mx-auto">
+        {/* Header with title and post button */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Books Exchange</h1>
           <Link
@@ -182,6 +205,7 @@ const BookList = () => {
               value={searchQuery}
               onChange={handleSearchInputChange}
             />
+            {/* Clear search button, only shown when search is active */}
             {isSearchActive && (
               <button
                 type="button"
@@ -194,6 +218,7 @@ const BookList = () => {
           </div>
         </div>
 
+        {/* Error message display */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
@@ -222,7 +247,7 @@ const BookList = () => {
           </div>
         )}
 
-        {/* Books Grid */}
+        {/* Books Grid - Main content area */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayBooks.length > 0 ? (
             displayBooks.map((book) => (
@@ -232,13 +257,14 @@ const BookList = () => {
                   book.booker_name ? "opacity-75" : ""
                 }`}
               >
+                {/* "BOOKED" ribbon for already booked books */}
                 {book.booker_name && (
                   <div className="absolute top-0 left-0 w-full bg-red-500 text-white text-center py-1 font-bold z-10">
                     BOOKED
                   </div>
                 )}
 
-                {/* Rest of your card content */}
+                {/* Book cover image */}
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img
                     src={getBookImageUrl(book.image)}
@@ -250,6 +276,8 @@ const BookList = () => {
                     }}
                   />
                 </div>
+
+                {/* Book details */}
                 <div className="p-4">
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">
                     {book.title}
@@ -263,39 +291,28 @@ const BookList = () => {
                   <p className="text-sm text-gray-600 mb-4">
                     Location: {book.location}
                   </p>
+
+                  {/* Booking button or confirmation dialog */}
                   {!book.booker_name &&
                     (bookingBookId === book.id ? (
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          placeholder="Your Name"
-                          className="w-full p-2 border border-gray-300 rounded"
-                          value={bookingFormData.booker_name}
-                          onChange={(e) =>
-                            setBookingFormData({
-                              ...bookingFormData,
-                              booker_name: e.target.value,
-                            })
-                          }
-                        />
-                        <input
-                          type="email"
-                          placeholder="Your Email"
-                          className="w-full p-2 border border-gray-300 rounded"
-                          value={bookingFormData.booker_email}
-                          onChange={(e) =>
-                            setBookingFormData({
-                              ...bookingFormData,
-                              booker_email: e.target.value,
-                            })
-                          }
-                        />
+                      <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-medium text-blue-800">
+                          Confirm Booking
+                        </h4>
+                        <p className="text-sm">
+                          You'll book this as:{" "}
+                          <strong>{bookingFormData.booker_name}</strong>
+                        </p>
+                        <p className="text-sm">
+                          Contact email:{" "}
+                          <strong>{bookingFormData.booker_email}</strong>
+                        </p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => submitBooking(book.id)}
                             className="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                           >
-                            Submit
+                            Confirm
                           </button>
                           <button
                             onClick={() => {
@@ -308,17 +325,19 @@ const BookList = () => {
                           </button>
                         </div>
                         {bookingError && (
-                          <p className="text-red-500 text-sm">{bookingError}</p>
+                          <p className="text-red-500 text-sm mt-2">
+                            {bookingError}
+                          </p>
                         )}
                       </div>
                     ) : (
                       <button
                         onClick={() => {
+                          if (!userLoggedIn) {
+                            navigate("/login");
+                            return;
+                          }
                           setBookingBookId(book.id);
-                          setBookingFormData({
-                            booker_name: "",
-                            booker_email: "",
-                          });
                         }}
                         className="block w-full text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                       >
@@ -329,6 +348,7 @@ const BookList = () => {
               </div>
             ))
           ) : (
+            // No books found message
             <div className="col-span-full bg-white rounded-lg shadow-md p-8 text-center">
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">
                 {isSearchActive
@@ -362,9 +382,10 @@ const BookList = () => {
           )}
         </div>
 
-        {/* The placeholder books section remains unchanged */}
+        {/* Placeholder books shown when no real books are available */}
         {books.length === 0 && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Display placeholder books */}
             {[1, 2, 3, 4, 5, 6].map((item) => (
               <div
                 key={item}
