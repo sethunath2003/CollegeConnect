@@ -14,6 +14,7 @@ import BookPost from "./modules/Books/BookPost";
 import BookDetail from "./modules/Books/BookDetail";
 import BookList from "./modules/Books/BookList"; // Add this import
 import PostBook from "./modules/Books/PostBook"; // Add this import
+import EventsPage from "./pages/EventsPage";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="/edit-draft/:draftId" element={<EditDraft />} />
             <Route path="/books/:id" element={<BookDetail />} />
             <Route path="/post-book" element={<PostBook />} />{" "}
+            <Route path="/eventlister" element={<EventsPage/>} />
             {/* Add this route */}
           </Routes>
         </div>
