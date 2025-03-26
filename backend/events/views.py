@@ -27,7 +27,6 @@ def run_scraper(request):
         registration_start_tag = card.find_all('div', class_='hackresgiterdate')[0] if len(card.find_all('div', class_='hackresgiterdate')) > 0 else None
         registration_end_tag = card.find_all('div', class_='hackresgiterdate')[1] if len(card.find_all('div', class_='hackresgiterdate')) > 1 else None
         link_tag = card.find("a", href=True)
-        location_tag = card.find('div', class_='location')  # Assuming location is in a div with class 'location'
 
         event_name = event_name_tag.text.strip() if event_name_tag else "No title found"
         image_url = image_tag["src"] if image_tag and "src" in image_tag.attrs else "No image"
@@ -35,7 +34,6 @@ def run_scraper(request):
         registration_start = registration_start_tag.text.strip() if registration_start_tag else "No start date found"
         registration_end = registration_end_tag.text.strip() if registration_end_tag else "No end date found"
         event_url = link_tag["href"] if link_tag else "No link found"
-        location = location_tag.text.strip() if location_tag else "No location found"
 
         events.append({
             "title": event_name,
@@ -43,8 +41,7 @@ def run_scraper(request):
             "description": event_description,
             "registration_start": registration_start,
             "registration_end": registration_end,
-            "event_url": event_url,
-            "location": location
+            "event_url": event_url
         })
 
     data = {
@@ -66,21 +63,18 @@ def home(request):
         event_name_tag = card.find('a', class_='allhackname eventName')
         event_description_tag = card.find('div', class_='eventDescription')
         registration_start_tag = card.find_all('div', class_='hackresgiterdate')[0] if len(card.find_all('div', class_='hackresgiterdate')) > 0 else None
-        registration_end_tag = card.find_all('div', class_='hackresgiterdate')[1] if len(card.find_all('div', class_='hackresgiterdate')) > 1 else None
-        location_tag = card.find('div', class_='location')  # Assuming location is in a div with class 'location'
+        registration_end_tag = card.find_all('div', class_='hackresgiterdate')[1] if len(card.find_all('div', 'hackresgiterdate')) > 1 else None
 
         event_name = event_name_tag.text.strip() if event_name_tag else "N/A"
         event_description = event_description_tag.text.strip() if event_description_tag else "N/A"
         registration_start = registration_start_tag.text.strip() if registration_start_tag else "N/A"
         registration_end = registration_end_tag.text.strip() if registration_end_tag else "N/A"
-        location = location_tag.text.strip() if location_tag else "No location found"
 
         events.append({
             "event_name": event_name,
             "event_description": event_description,
             "registration_start": registration_start,
-            "registration_end": registration_end,
-            "location": location
+            "registration_end": registration_end
         })
 
     return render(request, 'events/home.html', {'events': events})

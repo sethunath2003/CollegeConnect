@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scraped Data</title>
+</head>
+<body>
+    <h1>Scraped Data</h1>
+    <ul>
+        {% for hackathon in data %}
+            <li>
+                <h2>{{ hackathon.title }}</h2>
+                <p>Location: {{ hackathon.location }}</p>
+                <p>Date: {{ hackathon.date }}</p>
+                <p>{{ hackathon.description }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

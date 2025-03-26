@@ -50,4 +50,4 @@ class EventAPITestCase(APITestCase):
         mock_get.side_effect = requests.RequestException("Failed request")
         url = reverse('run-scraper')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)

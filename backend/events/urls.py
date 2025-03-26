@@ -1,5 +1,5 @@
 from django.urls import path
-from events.views import EventListView, run_scraper
+from .views import EventListView, run_scraper
 
 urlpatterns = [
     path('events/', EventListView.as_view(), name='event-list'),  # List of events
