@@ -21,13 +21,23 @@ function App() {
 
   // Track user activity and handle auto-logout
   useEffect(() => {
-    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "click"];
+    const events = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+      "click",
+    ];
     const updateActivity = () => setLastActivity(Date.now());
-    
-    events.forEach(event => window.addEventListener(event, updateActivity));
+
+    events.forEach((event) => window.addEventListener(event, updateActivity));
 
     const checkInactivity = setInterval(() => {
-      if (Date.now() - lastActivity > INACTIVITY_TIMEOUT && localStorage.getItem("token")) {
+      if (
+        Date.now() - lastActivity > INACTIVITY_TIMEOUT &&
+        localStorage.getItem("token")
+      ) {
         // Logout user
         localStorage.removeItem("user");
         localStorage.removeItem("token");
@@ -39,22 +49,28 @@ function App() {
     }, 60000); // Check every minute
 
     return () => {
-      events.forEach(event => window.removeEventListener(event, updateActivity));
+      events.forEach((event) =>
+        window.removeEventListener(event, updateActivity)
+      );
       clearInterval(checkInactivity);
     };
   }, [lastActivity]);
 
   // Set up authentication interceptor
   useEffect(() => {
+    // Add a request interceptor
     const interceptor = axios.interceptors.request.use(
-      config => {
+      (config) => {
         const token = localStorage.getItem("token");
-        if (token) config.headers["Authorization"] = `Bearer ${token}`;
+        if (token) {
+          config.headers["Authorization"] = `Bearer ${token}`;
+        }
         return config;
       },
-      error => Promise.reject(error)
+      (error) => Promise.reject(error)
     );
 
+    // Clean up the interceptor when the component unmounts
     return () => axios.interceptors.request.eject(interceptor);
   }, []);
 

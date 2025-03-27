@@ -5,6 +5,7 @@ import LoadingScreen from "../../components/LoadingScreen";
 
 const BookList = () => {
   const navigate = useNavigate();
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,22 +35,60 @@ const BookList = () => {
 
   // Fetch books when component mounts
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+
+    // Set userLoggedIn state based on whether token and user exist
+    setUserLoggedIn(!!token && !!user);
+
+    // Fetch books data
     const fetchBooks = async () => {
       try {
-        // This would be your actual API endpoint
-        const response = await axios.get("http://localhost:8000/api/books/");
-        setBooks(response.data);
-        setFilteredBooks(response.data);
+        setLoading(true);
+
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await axios.get("http://localhost:8000/api/books/", {
+          headers,
+        });
+
+        setBooks(response.data.results || response.data);
+        setFilteredBooks(response.data.results || response.data);
+        setError(null);
       } catch (err) {
-        console.error("Failed to fetch books:", err);
-        setError("Failed to load books. Please try again.");
+        console.error("Error fetching books:", err);
+
+        // Handle 401 error
+        if (err.response && err.response.status === 401) {
+          // Token is invalid, clear it
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUserLoggedIn(false);
+        }
+
+        setError("Failed to load books. Please try again later.");
       } finally {
-        // Simulate a short loading time for better UX
-        setTimeout(() => setLoading(false), 1000);
+        setLoading(false);
       }
     };
 
     fetchBooks();
+
+    // Add event listener to update login status if it changes
+    const handleStorageChange = () => {
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+      setUserLoggedIn(!!token && !!user);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const handleSearch = (e) => {
