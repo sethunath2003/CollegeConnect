@@ -1392,7 +1392,11 @@ function combineURLs(baseURL, relativeURL) {
 // node_modules/axios/lib/core/buildFullPath.js
 function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls) {
   let isRelativeUrl = !isAbsoluteURL(requestedURL);
+<<<<<<< HEAD
   if (baseURL && (isRelativeUrl || allowAbsoluteUrls == false)) {
+=======
+  if (baseURL && isRelativeUrl || allowAbsoluteUrls == false) {
+>>>>>>> books_newbutton
     return combineURLs(baseURL, requestedURL);
   }
   return requestedURL;
@@ -1483,7 +1487,11 @@ var resolveConfig_default = (config) => {
   const newConfig = mergeConfig({}, config);
   let { data, withXSRFToken, xsrfHeaderName, xsrfCookieName, headers, auth } = newConfig;
   newConfig.headers = headers = AxiosHeaders_default.from(headers);
+<<<<<<< HEAD
   newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url, newConfig.allowAbsoluteUrls), config.params, config.paramsSerializer);
+=======
+  newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url), config.params, config.paramsSerializer);
+>>>>>>> books_newbutton
   if (auth) {
     headers.set(
       "Authorization",
@@ -2015,7 +2023,11 @@ function dispatchRequest(config) {
 }
 
 // node_modules/axios/lib/env/data.js
+<<<<<<< HEAD
 var VERSION = "1.8.4";
+=======
+var VERSION = "1.8.1";
+>>>>>>> books_newbutton
 
 // node_modules/axios/lib/helpers/validator.js
 var validators = {};

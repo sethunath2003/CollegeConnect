@@ -1,31 +1,54 @@
 {
+<<<<<<< HEAD
   "hash": "782bbff0",
   "configHash": "0ebec96e",
   "lockfileHash": "5cad91a5",
   "browserHash": "d346411e",
+=======
+  "hash": "0bbc93ff",
+  "configHash": "0ebec96e",
+  "lockfileHash": "3f79302f",
+  "browserHash": "829ee263",
+>>>>>>> books_newbutton
   "optimized": {
     "react": {
       "src": "../../node_modules/react/index.js",
       "file": "react.js",
+<<<<<<< HEAD
       "fileHash": "b15f2d4b",
+=======
+      "fileHash": "e279cefa",
+>>>>>>> books_newbutton
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
+<<<<<<< HEAD
       "fileHash": "c7470cd8",
+=======
+      "fileHash": "acce2465",
+>>>>>>> books_newbutton
       "needsInterop": true
     },
     "react-router-dom": {
       "src": "../../node_modules/react-router-dom/dist/index.mjs",
       "file": "react-router-dom.js",
+<<<<<<< HEAD
       "fileHash": "bf7709d9",
+=======
+      "fileHash": "27b07c93",
+>>>>>>> books_newbutton
       "needsInterop": false
     },
     "axios": {
       "src": "../../node_modules/axios/index.js",
       "file": "axios.js",
+<<<<<<< HEAD
       "fileHash": "b039b8c9",
+=======
+      "fileHash": "13e9750e",
+>>>>>>> books_newbutton
       "needsInterop": false
     }
   },

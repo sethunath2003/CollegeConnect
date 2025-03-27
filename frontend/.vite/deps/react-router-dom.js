@@ -338,7 +338,11 @@ var require_set_cookie = __commonJS({
   }
 });
 
+<<<<<<< HEAD
 // node_modules/react-router/dist/development/chunk-GNGMS2XR.mjs
+=======
+// node_modules/react-router/dist/development/chunk-HA7DTUK3.mjs
+>>>>>>> books_newbutton
 var React3 = __toESM(require_react(), 1);
 var React = __toESM(require_react(), 1);
 var React2 = __toESM(require_react(), 1);
@@ -1010,7 +1014,11 @@ function raceSignal(promise, signal) {
   return Promise.race([abort, promise]);
 }
 
+<<<<<<< HEAD
 // node_modules/react-router/dist/development/chunk-GNGMS2XR.mjs
+=======
+// node_modules/react-router/dist/development/chunk-HA7DTUK3.mjs
+>>>>>>> books_newbutton
 var React8 = __toESM(require_react(), 1);
 var React7 = __toESM(require_react(), 1);
 var React5 = __toESM(require_react(), 1);
@@ -1020,12 +1028,15 @@ var React12 = __toESM(require_react(), 1);
 var React13 = __toESM(require_react(), 1);
 var import_cookie = __toESM(require_dist(), 1);
 var import_set_cookie_parser = __toESM(require_set_cookie(), 1);
+<<<<<<< HEAD
 var __typeError = (msg) => {
   throw TypeError(msg);
 };
 var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
 var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+=======
+>>>>>>> books_newbutton
 var Action = ((Action2) => {
   Action2["Pop"] = "POP";
   Action2["Push"] = "PUSH";
@@ -1364,6 +1375,7 @@ function getUrlBasedHistory(getLocation, createHref2, validateLocation, options 
   };
   return history;
 }
+<<<<<<< HEAD
 function unstable_createContext(defaultValue) {
   return { defaultValue };
 }
@@ -1391,6 +1403,8 @@ var unstable_RouterContextProvider = class {
   }
 };
 _map = /* @__PURE__ */ new WeakMap();
+=======
+>>>>>>> books_newbutton
 var immutableRouteKeys = /* @__PURE__ */ new Set([
   "lazy",
   "caseSensitive",
@@ -1947,9 +1961,15 @@ function createRouter(init) {
   );
   let inFlightDataRoutes;
   let basename = init.basename || "/";
+<<<<<<< HEAD
   let dataStrategyImpl = init.dataStrategy || defaultDataStrategyWithMiddleware;
   let future = {
     unstable_middleware: false,
+=======
+  let dataStrategyImpl = init.dataStrategy || defaultDataStrategy;
+  let patchRoutesOnNavigationImpl = init.patchRoutesOnNavigation;
+  let future = {
+>>>>>>> books_newbutton
     ...init.future
   };
   let unlistenHistory = null;
@@ -1961,7 +1981,11 @@ function createRouter(init) {
   let initialMatches = matchRoutes(dataRoutes, init.history.location, basename);
   let initialMatchesIsFOW = false;
   let initialErrors = null;
+<<<<<<< HEAD
   if (initialMatches == null && !init.patchRoutesOnNavigation) {
+=======
+  if (initialMatches == null && !patchRoutesOnNavigationImpl) {
+>>>>>>> books_newbutton
     let error = getInternalRouterError(404, {
       pathname: init.history.location.pathname
     });
@@ -2393,9 +2417,12 @@ function createRouter(init) {
       pendingNavigationController.signal,
       opts && opts.submission
     );
+<<<<<<< HEAD
     let scopedContext = new unstable_RouterContextProvider(
       init.unstable_getContext ? await init.unstable_getContext() : void 0
     );
+=======
+>>>>>>> books_newbutton
     let pendingActionResult;
     if (opts && opts.pendingError) {
       pendingActionResult = [
@@ -2408,7 +2435,10 @@ function createRouter(init) {
         location,
         opts.submission,
         matches,
+<<<<<<< HEAD
         scopedContext,
+=======
+>>>>>>> books_newbutton
         fogOfWar.active,
         { replace: opts.replace, flushSync: flushSync2 }
       );
@@ -2449,7 +2479,10 @@ function createRouter(init) {
       request,
       location,
       matches,
+<<<<<<< HEAD
       scopedContext,
+=======
+>>>>>>> books_newbutton
       fogOfWar.active,
       loadingNavigation,
       opts && opts.submission,
@@ -2470,7 +2503,11 @@ function createRouter(init) {
       errors
     });
   }
+<<<<<<< HEAD
   async function handleAction(request, location, submission, matches, scopedContext, isFogOfWar, opts = {}) {
+=======
+  async function handleAction(request, location, submission, matches, isFogOfWar, opts = {}) {
+>>>>>>> books_newbutton
     interruptActiveLoads();
     let navigation = getSubmittingNavigation(location, submission);
     updateState({ navigation }, { flushSync: opts.flushSync === true });
@@ -2526,6 +2563,7 @@ function createRouter(init) {
     } else {
       let results = await callDataStrategy(
         "action",
+<<<<<<< HEAD
         request,
         [actionMatch],
         matches,
@@ -2541,6 +2579,15 @@ function createRouter(init) {
           }
         }
       }
+=======
+        state,
+        request,
+        [actionMatch],
+        matches,
+        null
+      );
+      result = results[actionMatch.route.id];
+>>>>>>> books_newbutton
       if (request.signal.aborted) {
         return { shortCircuited: true };
       }
@@ -2578,7 +2625,11 @@ function createRouter(init) {
       pendingActionResult: [actionMatch.route.id, result]
     };
   }
+<<<<<<< HEAD
   async function handleLoaders(request, location, matches, scopedContext, isFogOfWar, overrideNavigation, submission, fetcherSubmission, replace2, initialHydration, flushSync2, pendingActionResult) {
+=======
+  async function handleLoaders(request, location, matches, isFogOfWar, overrideNavigation, submission, fetcherSubmission, replace2, initialHydration, flushSync2, pendingActionResult) {
+>>>>>>> books_newbutton
     let loadingNavigation = overrideNavigation || getLoadingNavigation(location, submission);
     let activeSubmission = submission || fetcherSubmission || getSubmissionFromNavigation(loadingNavigation);
     let shouldUpdateNavigationState = !isUninterruptedRevalidation && !initialHydration;
@@ -2688,11 +2739,19 @@ function createRouter(init) {
       );
     }
     let { loaderResults, fetcherResults } = await callLoadersAndMaybeResolveData(
+<<<<<<< HEAD
       matches,
       matchesToLoad,
       revalidatingFetchers,
       request,
       scopedContext
+=======
+      state,
+      matches,
+      matchesToLoad,
+      revalidatingFetchers,
+      request
+>>>>>>> books_newbutton
     );
     if (request.signal.aborted) {
       return { shortCircuited: true };
@@ -2800,9 +2859,12 @@ function createRouter(init) {
       return;
     }
     let match = getTargetMatch(matches, path);
+<<<<<<< HEAD
     let scopedContext = new unstable_RouterContextProvider(
       init.unstable_getContext ? await init.unstable_getContext() : void 0
     );
+=======
+>>>>>>> books_newbutton
     let preventScrollReset = (opts && opts.preventScrollReset) === true;
     if (submission && isMutationMethod(submission.formMethod)) {
       await handleFetcherAction(
@@ -2811,7 +2873,10 @@ function createRouter(init) {
         path,
         match,
         matches,
+<<<<<<< HEAD
         scopedContext,
+=======
+>>>>>>> books_newbutton
         fogOfWar.active,
         flushSync2,
         preventScrollReset,
@@ -2826,14 +2891,21 @@ function createRouter(init) {
       path,
       match,
       matches,
+<<<<<<< HEAD
       scopedContext,
+=======
+>>>>>>> books_newbutton
       fogOfWar.active,
       flushSync2,
       preventScrollReset,
       submission
     );
   }
+<<<<<<< HEAD
   async function handleFetcherAction(key, routeId, path, match, requestMatches, scopedContext, isFogOfWar, flushSync2, preventScrollReset, submission) {
+=======
+  async function handleFetcherAction(key, routeId, path, match, requestMatches, isFogOfWar, flushSync2, preventScrollReset, submission) {
+>>>>>>> books_newbutton
     interruptActiveLoads();
     fetchLoadMatches.delete(key);
     function detectAndHandle405Error(m) {
@@ -2866,8 +2938,12 @@ function createRouter(init) {
       let discoverResult = await discoverRoutes(
         requestMatches,
         path,
+<<<<<<< HEAD
         fetchRequest.signal,
         key
+=======
+        fetchRequest.signal
+>>>>>>> books_newbutton
       );
       if (discoverResult.type === "aborted") {
         return;
@@ -2894,10 +2970,17 @@ function createRouter(init) {
     let originatingLoadId = incrementingLoadId;
     let actionResults = await callDataStrategy(
       "action",
+<<<<<<< HEAD
       fetchRequest,
       [match],
       requestMatches,
       scopedContext,
+=======
+      state,
+      fetchRequest,
+      [match],
+      requestMatches,
+>>>>>>> books_newbutton
       key
     );
     let actionResult = actionResults[match.route.id];
@@ -2981,11 +3064,19 @@ function createRouter(init) {
       abortPendingFetchRevalidations
     );
     let { loaderResults, fetcherResults } = await callLoadersAndMaybeResolveData(
+<<<<<<< HEAD
       matches,
       matchesToLoad,
       revalidatingFetchers,
       revalidationRequest,
       scopedContext
+=======
+      state,
+      matches,
+      matchesToLoad,
+      revalidatingFetchers,
+      revalidationRequest
+>>>>>>> books_newbutton
     );
     if (abortController.signal.aborted) {
       return;
@@ -3052,7 +3143,11 @@ function createRouter(init) {
       isRevalidationRequired = false;
     }
   }
+<<<<<<< HEAD
   async function handleFetcherLoader(key, routeId, path, match, matches, scopedContext, isFogOfWar, flushSync2, preventScrollReset, submission) {
+=======
+  async function handleFetcherLoader(key, routeId, path, match, matches, isFogOfWar, flushSync2, preventScrollReset, submission) {
+>>>>>>> books_newbutton
     let existingFetcher = state.fetchers.get(key);
     updateFetcherState(
       key,
@@ -3072,8 +3167,12 @@ function createRouter(init) {
       let discoverResult = await discoverRoutes(
         matches,
         path,
+<<<<<<< HEAD
         fetchRequest.signal,
         key
+=======
+        fetchRequest.signal
+>>>>>>> books_newbutton
       );
       if (discoverResult.type === "aborted") {
         return;
@@ -3097,10 +3196,17 @@ function createRouter(init) {
     let originatingLoadId = incrementingLoadId;
     let results = await callDataStrategy(
       "loader",
+<<<<<<< HEAD
       fetchRequest,
       [match],
       matches,
       scopedContext,
+=======
+      state,
+      fetchRequest,
+      [match],
+      matches,
+>>>>>>> books_newbutton
       key
     );
     let result = results[match.route.id];
@@ -3202,21 +3308,33 @@ function createRouter(init) {
       });
     }
   }
+<<<<<<< HEAD
   async function callDataStrategy(type, request, matchesToLoad, matches, scopedContext, fetcherKey) {
+=======
+  async function callDataStrategy(type, state2, request, matchesToLoad, matches, fetcherKey) {
+>>>>>>> books_newbutton
     let results;
     let dataResults = {};
     try {
       results = await callDataStrategyImpl(
         dataStrategyImpl,
         type,
+<<<<<<< HEAD
+=======
+        state2,
+>>>>>>> books_newbutton
         request,
         matchesToLoad,
         matches,
         fetcherKey,
         manifest,
+<<<<<<< HEAD
         mapRouteProperties2,
         scopedContext,
         future.unstable_middleware
+=======
+        mapRouteProperties2
+>>>>>>> books_newbutton
       );
     } catch (e) {
       matchesToLoad.forEach((m) => {
@@ -3248,6 +3366,7 @@ function createRouter(init) {
     }
     return dataResults;
   }
+<<<<<<< HEAD
   async function callLoadersAndMaybeResolveData(matches, matchesToLoad, fetchersToLoad, request, scopedContext) {
     let loaderResultsPromise = callDataStrategy(
       "loader",
@@ -3255,6 +3374,15 @@ function createRouter(init) {
       matchesToLoad,
       matches,
       scopedContext,
+=======
+  async function callLoadersAndMaybeResolveData(state2, matches, matchesToLoad, fetchersToLoad, request) {
+    let loaderResultsPromise = callDataStrategy(
+      "loader",
+      state2,
+      request,
+      matchesToLoad,
+      matches,
+>>>>>>> books_newbutton
       null
     );
     let fetcherResultsPromise = Promise.all(
@@ -3262,10 +3390,17 @@ function createRouter(init) {
         if (f.matches && f.match && f.controller) {
           let results = await callDataStrategy(
             "loader",
+<<<<<<< HEAD
             createClientSideRequest(init.history, f.path, f.controller.signal),
             [f.match],
             f.matches,
             scopedContext,
+=======
+            state2,
+            createClientSideRequest(init.history, f.path, f.controller.signal),
+            [f.match],
+            f.matches,
+>>>>>>> books_newbutton
             f.key
           );
           let result = results[f.match.route.id];
@@ -3487,7 +3622,11 @@ function createRouter(init) {
     return null;
   }
   function checkFogOfWar(matches, routesToUse, pathname) {
+<<<<<<< HEAD
     if (init.patchRoutesOnNavigation) {
+=======
+    if (patchRoutesOnNavigationImpl) {
+>>>>>>> books_newbutton
       if (!matches) {
         let fogMatches = matchRoutesImpl(
           routesToUse,
@@ -3510,8 +3649,13 @@ function createRouter(init) {
     }
     return { active: false, matches: null };
   }
+<<<<<<< HEAD
   async function discoverRoutes(matches, pathname, signal, fetcherKey) {
     if (!init.patchRoutesOnNavigation) {
+=======
+  async function discoverRoutes(matches, pathname, signal) {
+    if (!patchRoutesOnNavigationImpl) {
+>>>>>>> books_newbutton
       return { type: "success", matches };
     }
     let partialMatches = matches;
@@ -3520,11 +3664,18 @@ function createRouter(init) {
       let routesToUse = inFlightDataRoutes || dataRoutes;
       let localManifest = manifest;
       try {
+<<<<<<< HEAD
         await init.patchRoutesOnNavigation({
           signal,
           path: pathname,
           matches: partialMatches,
           fetcherKey,
+=======
+        await patchRoutesOnNavigationImpl({
+          signal,
+          path: pathname,
+          matches: partialMatches,
+>>>>>>> books_newbutton
           patch: (routeId, children) => {
             if (signal.aborted) return;
             patchRoutesImpl(
@@ -3643,21 +3794,33 @@ function createStaticHandler(routes, opts) {
   );
   async function query(request, {
     requestContext,
+<<<<<<< HEAD
     filterMatchesToLoad,
     skipLoaderErrorBubbling,
     skipRevalidation,
     dataStrategy,
     unstable_respond: respond
+=======
+    skipLoaderErrorBubbling,
+    dataStrategy
+>>>>>>> books_newbutton
   } = {}) {
     let url = new URL(request.url);
     let method = request.method;
     let location = createLocation("", createPath(url), null, "default");
     let matches = matchRoutes(dataRoutes, location, basename);
+<<<<<<< HEAD
     requestContext = requestContext != null ? requestContext : new unstable_RouterContextProvider();
     if (!isValidMethod(method) && method !== "HEAD") {
       let error = getInternalRouterError(405, { method });
       let { matches: methodNotAllowedMatches, route } = getShortCircuitMatches(dataRoutes);
       let staticContext = {
+=======
+    if (!isValidMethod(method) && method !== "HEAD") {
+      let error = getInternalRouterError(405, { method });
+      let { matches: methodNotAllowedMatches, route } = getShortCircuitMatches(dataRoutes);
+      return {
+>>>>>>> books_newbutton
         basename,
         location,
         matches: methodNotAllowedMatches,
@@ -3670,11 +3833,18 @@ function createStaticHandler(routes, opts) {
         loaderHeaders: {},
         actionHeaders: {}
       };
+<<<<<<< HEAD
       return respond ? respond(staticContext) : staticContext;
     } else if (!matches) {
       let error = getInternalRouterError(404, { pathname: location.pathname });
       let { matches: notFoundMatches, route } = getShortCircuitMatches(dataRoutes);
       let staticContext = {
+=======
+    } else if (!matches) {
+      let error = getInternalRouterError(404, { pathname: location.pathname });
+      let { matches: notFoundMatches, route } = getShortCircuitMatches(dataRoutes);
+      return {
+>>>>>>> books_newbutton
         basename,
         location,
         matches: notFoundMatches,
@@ -3687,6 +3857,7 @@ function createStaticHandler(routes, opts) {
         loaderHeaders: {},
         actionHeaders: {}
       };
+<<<<<<< HEAD
       return respond ? respond(staticContext) : staticContext;
     }
     if (respond && matches.some((m) => m.route.unstable_middleware)) {
@@ -3768,6 +3939,8 @@ function createStaticHandler(routes, opts) {
         }
         throw e;
       }
+=======
+>>>>>>> books_newbutton
     }
     let result = await queryImpl(
       request,
@@ -3776,9 +3949,13 @@ function createStaticHandler(routes, opts) {
       requestContext,
       dataStrategy || null,
       skipLoaderErrorBubbling === true,
+<<<<<<< HEAD
       null,
       filterMatchesToLoad || null,
       skipRevalidation === true
+=======
+      null
+>>>>>>> books_newbutton
     );
     if (isResponse(result)) {
       return result;
@@ -3788,14 +3965,21 @@ function createStaticHandler(routes, opts) {
   async function queryRoute(request, {
     routeId,
     requestContext,
+<<<<<<< HEAD
     dataStrategy,
     unstable_respond: respond
+=======
+    dataStrategy
+>>>>>>> books_newbutton
   } = {}) {
     let url = new URL(request.url);
     let method = request.method;
     let location = createLocation("", createPath(url), null, "default");
     let matches = matchRoutes(dataRoutes, location, basename);
+<<<<<<< HEAD
     requestContext = requestContext != null ? requestContext : new unstable_RouterContextProvider();
+=======
+>>>>>>> books_newbutton
     if (!isValidMethod(method) && method !== "HEAD" && method !== "OPTIONS") {
       throw getInternalRouterError(405, { method });
     } else if (!matches) {
@@ -3810,6 +3994,7 @@ function createStaticHandler(routes, opts) {
     } else if (!match) {
       throw getInternalRouterError(404, { pathname: location.pathname });
     }
+<<<<<<< HEAD
     if (respond && matches.some((m) => m.route.unstable_middleware)) {
       invariant(
         requestContext instanceof unstable_RouterContextProvider,
@@ -3859,6 +4044,8 @@ function createStaticHandler(routes, opts) {
       );
       return response;
     }
+=======
+>>>>>>> books_newbutton
     let result = await queryImpl(
       request,
       location,
@@ -3866,9 +4053,13 @@ function createStaticHandler(routes, opts) {
       requestContext,
       dataStrategy || null,
       false,
+<<<<<<< HEAD
       match,
       null,
       false
+=======
+      match
+>>>>>>> books_newbutton
     );
     if (isResponse(result)) {
       return result;
@@ -3885,7 +4076,11 @@ function createStaticHandler(routes, opts) {
     }
     return void 0;
   }
+<<<<<<< HEAD
   async function queryImpl(request, location, matches, requestContext, dataStrategy, skipLoaderErrorBubbling, routeMatch, filterMatchesToLoad, skipRevalidation) {
+=======
+  async function queryImpl(request, location, matches, requestContext, dataStrategy, skipLoaderErrorBubbling, routeMatch) {
+>>>>>>> books_newbutton
     invariant(
       request.signal,
       "query()/queryRoute() requests must contain an AbortController signal"
@@ -3899,9 +4094,13 @@ function createStaticHandler(routes, opts) {
           requestContext,
           dataStrategy,
           skipLoaderErrorBubbling,
+<<<<<<< HEAD
           routeMatch != null,
           filterMatchesToLoad,
           skipRevalidation
+=======
+          routeMatch != null
+>>>>>>> books_newbutton
         );
         return result2;
       }
@@ -3911,8 +4110,12 @@ function createStaticHandler(routes, opts) {
         requestContext,
         dataStrategy,
         skipLoaderErrorBubbling,
+<<<<<<< HEAD
         routeMatch,
         filterMatchesToLoad
+=======
+        routeMatch
+>>>>>>> books_newbutton
       );
       return isResponse(result) ? result : {
         ...result,
@@ -3932,7 +4135,11 @@ function createStaticHandler(routes, opts) {
       throw e;
     }
   }
+<<<<<<< HEAD
   async function submit(request, matches, actionMatch, requestContext, dataStrategy, skipLoaderErrorBubbling, isRouteRequest, filterMatchesToLoad, skipRevalidation) {
+=======
+  async function submit(request, matches, actionMatch, requestContext, dataStrategy, skipLoaderErrorBubbling, isRouteRequest) {
+>>>>>>> books_newbutton
     let result;
     if (!actionMatch.route.action && !actionMatch.route.lazy) {
       let error = getInternalRouterError(405, {
@@ -3986,6 +4193,7 @@ function createStaticHandler(routes, opts) {
         actionHeaders: {}
       };
     }
+<<<<<<< HEAD
     if (skipRevalidation) {
       if (isErrorResult(result)) {
         let boundaryMatch = skipLoaderErrorBubbling ? actionMatch : findNearestBoundary(matches, actionMatch.route.id);
@@ -4016,6 +4224,8 @@ function createStaticHandler(routes, opts) {
         };
       }
     }
+=======
+>>>>>>> books_newbutton
     let loaderRequest = new Request(request.url, {
       headers: request.headers,
       redirect: request.redirect,
@@ -4023,18 +4233,29 @@ function createStaticHandler(routes, opts) {
     });
     if (isErrorResult(result)) {
       let boundaryMatch = skipLoaderErrorBubbling ? actionMatch : findNearestBoundary(matches, actionMatch.route.id);
+<<<<<<< HEAD
       let handlerContext2 = await loadRouteData(
+=======
+      let context2 = await loadRouteData(
+>>>>>>> books_newbutton
         loaderRequest,
         matches,
         requestContext,
         dataStrategy,
         skipLoaderErrorBubbling,
         null,
+<<<<<<< HEAD
         filterMatchesToLoad,
         [boundaryMatch.route.id, result]
       );
       return {
         ...handlerContext2,
+=======
+        [boundaryMatch.route.id, result]
+      );
+      return {
+        ...context2,
+>>>>>>> books_newbutton
         statusCode: isRouteErrorResponse(result.error) ? result.error.status : result.statusCode != null ? result.statusCode : 500,
         actionData: null,
         actionHeaders: {
@@ -4042,17 +4263,28 @@ function createStaticHandler(routes, opts) {
         }
       };
     }
+<<<<<<< HEAD
     let handlerContext = await loadRouteData(
+=======
+    let context = await loadRouteData(
+>>>>>>> books_newbutton
       loaderRequest,
       matches,
       requestContext,
       dataStrategy,
       skipLoaderErrorBubbling,
+<<<<<<< HEAD
       null,
       filterMatchesToLoad
     );
     return {
       ...handlerContext,
+=======
+      null
+    );
+    return {
+      ...context,
+>>>>>>> books_newbutton
       actionData: {
         [actionMatch.route.id]: result.data
       },
@@ -4061,7 +4293,11 @@ function createStaticHandler(routes, opts) {
       actionHeaders: result.headers ? { [actionMatch.route.id]: result.headers } : {}
     };
   }
+<<<<<<< HEAD
   async function loadRouteData(request, matches, requestContext, dataStrategy, skipLoaderErrorBubbling, routeMatch, filterMatchesToLoad, pendingActionResult) {
+=======
+  async function loadRouteData(request, matches, requestContext, dataStrategy, skipLoaderErrorBubbling, routeMatch, pendingActionResult) {
+>>>>>>> books_newbutton
     let isRouteRequest = routeMatch != null;
     if (isRouteRequest && !(routeMatch == null ? void 0 : routeMatch.route.loader) && !(routeMatch == null ? void 0 : routeMatch.route.lazy)) {
       throw getInternalRouterError(400, {
@@ -4072,7 +4308,11 @@ function createStaticHandler(routes, opts) {
     }
     let requestMatches = routeMatch ? [routeMatch] : pendingActionResult && isErrorResult(pendingActionResult[1]) ? getLoaderMatchesUntilBoundary(matches, pendingActionResult[0]) : matches;
     let matchesToLoad = requestMatches.filter(
+<<<<<<< HEAD
       (m) => (m.route.loader || m.route.lazy) && (!filterMatchesToLoad || filterMatchesToLoad(m))
+=======
+      (m) => m.route.loader || m.route.lazy
+>>>>>>> books_newbutton
     );
     if (matchesToLoad.length === 0) {
       return {
@@ -4101,7 +4341,11 @@ function createStaticHandler(routes, opts) {
     if (request.signal.aborted) {
       throwStaticHandlerAbortedError(request, isRouteRequest);
     }
+<<<<<<< HEAD
     let handlerContext = processRouteLoaderData(
+=======
+    let context = processRouteLoaderData(
+>>>>>>> books_newbutton
       matches,
       results,
       pendingActionResult,
@@ -4113,11 +4357,19 @@ function createStaticHandler(routes, opts) {
     );
     matches.forEach((match) => {
       if (!executedLoaders.has(match.route.id)) {
+<<<<<<< HEAD
         handlerContext.loaderData[match.route.id] = null;
       }
     });
     return {
       ...handlerContext,
+=======
+        context.loaderData[match.route.id] = null;
+      }
+    });
+    return {
+      ...context,
+>>>>>>> books_newbutton
       matches
     };
   }
@@ -4125,15 +4377,23 @@ function createStaticHandler(routes, opts) {
     let results = await callDataStrategyImpl(
       dataStrategy || defaultDataStrategy,
       type,
+<<<<<<< HEAD
+=======
+      null,
+>>>>>>> books_newbutton
       request,
       matchesToLoad,
       matches,
       null,
       manifest,
       mapRouteProperties2,
+<<<<<<< HEAD
       requestContext,
       false
       // middleware not done via dataStrategy in the static handler
+=======
+      requestContext
+>>>>>>> books_newbutton
     );
     let dataResults = {};
     await Promise.all(
@@ -4166,6 +4426,7 @@ function createStaticHandler(routes, opts) {
     queryRoute
   };
 }
+<<<<<<< HEAD
 function getStaticContextFromError(routes, handlerContext, error, boundaryId) {
   let errorBoundaryId = boundaryId || handlerContext._deepestRenderedBoundaryId || routes[0].id;
   return {
@@ -4175,6 +4436,17 @@ function getStaticContextFromError(routes, handlerContext, error, boundaryId) {
       [errorBoundaryId]: error
     }
   };
+=======
+function getStaticContextFromError(routes, context, error) {
+  let newContext = {
+    ...context,
+    statusCode: isRouteErrorResponse(error) ? error.status : 500,
+    errors: {
+      [context._deepestRenderedBoundaryId || routes[0].id]: error
+    }
+  };
+  return newContext;
+>>>>>>> books_newbutton
 }
 function throwStaticHandlerAbortedError(request, isRouteRequest) {
   if (request.signal.reason !== void 0) {
@@ -4570,6 +4842,7 @@ async function loadLazyRouteModule(route, mapRouteProperties2, manifest) {
     lazy: void 0
   });
 }
+<<<<<<< HEAD
 async function defaultDataStrategy(args) {
   let matchesToLoad = args.matches.filter((m) => m.shouldLoad);
   let keyedResults = {};
@@ -4691,6 +4964,22 @@ async function callDataStrategyImpl(dataStrategyImpl, type, request, matchesToLo
   if (enableMiddleware) {
     await Promise.all(loadRouteDefinitionsPromises);
   }
+=======
+async function defaultDataStrategy({
+  matches
+}) {
+  let matchesToLoad = matches.filter((m) => m.shouldLoad);
+  let results = await Promise.all(matchesToLoad.map((m) => m.resolve()));
+  return results.reduce(
+    (acc, result, i) => Object.assign(acc, { [matchesToLoad[i].route.id]: result }),
+    {}
+  );
+}
+async function callDataStrategyImpl(dataStrategyImpl, type, state, request, matchesToLoad, matches, fetcherKey, manifest, mapRouteProperties2, requestContext) {
+  let loadRouteDefinitionsPromises = matches.map(
+    (m) => m.route.lazy ? loadLazyRouteModule(m.route, mapRouteProperties2, manifest) : void 0
+  );
+>>>>>>> books_newbutton
   let dsMatches = matches.map((match, i) => {
     let loadRoutePromise = loadRouteDefinitionsPromises[i];
     let shouldLoad = matchesToLoad.some((m) => m.route.id === match.route.id);
@@ -4704,7 +4993,11 @@ async function callDataStrategyImpl(dataStrategyImpl, type, request, matchesToLo
         match,
         loadRoutePromise,
         handlerOverride,
+<<<<<<< HEAD
         scopedContext
+=======
+        requestContext
+>>>>>>> books_newbutton
       ) : Promise.resolve({ type: "data", result: void 0 });
     };
     return {
@@ -4718,7 +5011,11 @@ async function callDataStrategyImpl(dataStrategyImpl, type, request, matchesToLo
     request,
     params: matches[0].params,
     fetcherKey,
+<<<<<<< HEAD
     context: scopedContext
+=======
+    context: requestContext
+>>>>>>> books_newbutton
   });
   try {
     await Promise.all(loadRouteDefinitionsPromises);
@@ -4726,7 +5023,11 @@ async function callDataStrategyImpl(dataStrategyImpl, type, request, matchesToLo
   }
   return results;
 }
+<<<<<<< HEAD
 async function callLoaderOrAction(type, request, match, loadRoutePromise, handlerOverride, scopedContext) {
+=======
+async function callLoaderOrAction(type, request, match, loadRoutePromise, handlerOverride, staticContext) {
+>>>>>>> books_newbutton
   let result;
   let onReject;
   let runHandler = (handler) => {
@@ -4746,7 +5047,11 @@ async function callLoaderOrAction(type, request, match, loadRoutePromise, handle
         {
           request,
           params: match.params,
+<<<<<<< HEAD
           context: scopedContext
+=======
+          context: staticContext
+>>>>>>> books_newbutton
         },
         ...ctx !== void 0 ? [ctx] : []
       );
@@ -6096,7 +6401,10 @@ function mapRouteProperties(route) {
 function createMemoryRouter(routes, opts) {
   return createRouter({
     basename: opts == null ? void 0 : opts.basename,
+<<<<<<< HEAD
     unstable_getContext: opts == null ? void 0 : opts.unstable_getContext,
+=======
+>>>>>>> books_newbutton
     future: opts == null ? void 0 : opts.future,
     history: createMemoryHistory({
       initialEntries: opts == null ? void 0 : opts.initialEntries,
@@ -7031,6 +7339,7 @@ function StreamTransfer({
     )));
   }
 }
+<<<<<<< HEAD
 function handleMiddlewareError(error, routeId) {
   return { [routeId]: { type: "error", result: error } };
 }
@@ -7044,6 +7353,12 @@ function getSingleFetchDataStrategy(manifest, routeModules, ssr, basename, getRo
         () => singleFetchActionStrategy(request, matches, basename),
         handleMiddlewareError
       );
+=======
+function getSingleFetchDataStrategy(manifest, routeModules, ssr, getRouter) {
+  return async ({ request, matches, fetcherKey }) => {
+    if (request.method !== "GET") {
+      return singleFetchActionStrategy(request, matches);
+>>>>>>> books_newbutton
     }
     if (!ssr) {
       let foundRevalidatingServerLoader = matches.some(
@@ -7053,6 +7368,7 @@ function getSingleFetchDataStrategy(manifest, routeModules, ssr, basename, getRo
         }
       );
       if (!foundRevalidatingServerLoader) {
+<<<<<<< HEAD
         return runMiddlewarePipeline(
           args,
           false,
@@ -7086,12 +7402,52 @@ function getSingleFetchDataStrategy(manifest, routeModules, ssr, basename, getRo
   };
 }
 async function singleFetchActionStrategy(request, matches, basename) {
+=======
+        let matchesToLoad = matches.filter((m) => m.shouldLoad);
+        let url = stripIndexParam(singleFetchUrl(request.url));
+        let init = await createRequestInit(request);
+        let results = {};
+        await Promise.all(
+          matchesToLoad.map(
+            (m) => m.resolve(async (handler) => {
+              var _a;
+              try {
+                let result = ((_a = manifest.routes[m.route.id]) == null ? void 0 : _a.hasClientLoader) ? await fetchSingleLoader(handler, url, init, m.route.id) : await handler();
+                results[m.route.id] = { type: "data", result };
+              } catch (e) {
+                results[m.route.id] = { type: "error", result: e };
+              }
+            })
+          )
+        );
+        return results;
+      }
+    }
+    if (fetcherKey) {
+      return singleFetchLoaderFetcherStrategy(request, matches);
+    }
+    return singleFetchLoaderNavigationStrategy(
+      manifest,
+      routeModules,
+      ssr,
+      getRouter(),
+      request,
+      matches
+    );
+  };
+}
+async function singleFetchActionStrategy(request, matches) {
+>>>>>>> books_newbutton
   let actionMatch = matches.find((m) => m.shouldLoad);
   invariant2(actionMatch, "No action match found");
   let actionStatus = void 0;
   let result = await actionMatch.resolve(async (handler) => {
     let result2 = await handler(async () => {
+<<<<<<< HEAD
       let url = singleFetchUrl(request.url, basename);
+=======
+      let url = singleFetchUrl(request.url);
+>>>>>>> books_newbutton
       let init = await createRequestInit(request);
       let { data: data2, status } = await fetchAndDecode(url, init);
       actionStatus = status;
@@ -7112,6 +7468,7 @@ async function singleFetchActionStrategy(request, matches, basename) {
     }
   };
 }
+<<<<<<< HEAD
 async function nonSsrStrategy(manifest, request, matches, basename) {
   let matchesToLoad = matches.filter((m) => m.shouldLoad);
   let url = stripIndexParam(singleFetchUrl(request.url, basename));
@@ -7133,27 +7490,43 @@ async function nonSsrStrategy(manifest, request, matches, basename) {
   return results;
 }
 async function singleFetchLoaderNavigationStrategy(manifest, routeModules, ssr, router2, request, matches, basename) {
+=======
+async function singleFetchLoaderNavigationStrategy(manifest, routeModules, ssr, router2, request, matches) {
+>>>>>>> books_newbutton
   let routesParams = /* @__PURE__ */ new Set();
   let foundOptOutRoute = false;
   let routeDfds = matches.map(() => createDeferred2());
   let routesLoadedPromise = Promise.all(routeDfds.map((d) => d.promise));
   let singleFetchDfd = createDeferred2();
+<<<<<<< HEAD
   let url = stripIndexParam(singleFetchUrl(request.url, basename));
+=======
+  let url = stripIndexParam(singleFetchUrl(request.url));
+>>>>>>> books_newbutton
   let init = await createRequestInit(request);
   let results = {};
   let resolvePromise = Promise.all(
     matches.map(
       async (m, i) => m.resolve(async (handler) => {
+<<<<<<< HEAD
+=======
+        var _a;
+>>>>>>> books_newbutton
         routeDfds[i].resolve();
         let manifestRoute = manifest.routes[m.route.id];
         if (!m.shouldLoad) {
           if (!router2.state.initialized) {
             return;
           }
+<<<<<<< HEAD
           if (m.route.id in router2.state.loaderData && manifestRoute && m.route.shouldRevalidate) {
             if (manifestRoute.hasLoader) {
               foundOptOutRoute = true;
             }
+=======
+          if (m.route.id in router2.state.loaderData && manifestRoute && manifestRoute.hasLoader && ((_a = routeModules[m.route.id]) == null ? void 0 : _a.shouldRevalidate)) {
+            foundOptOutRoute = true;
+>>>>>>> books_newbutton
             return;
           }
         }
@@ -7215,11 +7588,19 @@ async function singleFetchLoaderNavigationStrategy(manifest, routeModules, ssr, 
   await resolvePromise;
   return results;
 }
+<<<<<<< HEAD
 async function singleFetchLoaderFetcherStrategy(request, matches, basename) {
   let fetcherMatch = matches.find((m) => m.shouldLoad);
   invariant2(fetcherMatch, "No fetcher match found");
   let result = await fetcherMatch.resolve(async (handler) => {
     let url = stripIndexParam(singleFetchUrl(request.url, basename));
+=======
+async function singleFetchLoaderFetcherStrategy(request, matches) {
+  let fetcherMatch = matches.find((m) => m.shouldLoad);
+  invariant2(fetcherMatch, "No fetcher match found");
+  let result = await fetcherMatch.resolve(async (handler) => {
+    let url = stripIndexParam(singleFetchUrl(request.url));
+>>>>>>> books_newbutton
     let init = await createRequestInit(request);
     return fetchSingleLoader(handler, url, init, fetcherMatch.route.id);
   });
@@ -7247,7 +7628,11 @@ function stripIndexParam(url) {
   }
   return url;
 }
+<<<<<<< HEAD
 function singleFetchUrl(reqUrl, basename) {
+=======
+function singleFetchUrl(reqUrl) {
+>>>>>>> books_newbutton
   let url = typeof reqUrl === "string" ? new URL(
     reqUrl,
     // This can be called during the SSR flow via PrefetchPageLinksImpl so
@@ -7256,8 +7641,11 @@ function singleFetchUrl(reqUrl, basename) {
   ) : reqUrl;
   if (url.pathname === "/") {
     url.pathname = "_root.data";
+<<<<<<< HEAD
   } else if (basename && stripBasename(url.pathname, basename) === "/") {
     url.pathname = `${basename.replace(/\/$/, "")}/_root.data`;
+=======
+>>>>>>> books_newbutton
   } else {
     url.pathname = `${url.pathname.replace(/\/$/, "")}.data`;
   }
@@ -7541,8 +7929,13 @@ function createServerRoutes(manifest, routeModules, future, isSpaMode, parentId 
       // render, so just give it a no-op function so we can render down to the
       // proper fallback
       loader: route.hasLoader || route.hasClientLoader ? () => null : void 0
+<<<<<<< HEAD
       // We don't need middleware/action/shouldRevalidate on these routes since
       // they're for a static render
+=======
+      // We don't need action/shouldRevalidate on these routes since they're
+      // for a static render
+>>>>>>> books_newbutton
     };
     let children = createServerRoutes(
       manifest,
@@ -7637,7 +8030,10 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
       Object.assign(dataRoute, {
         ...dataRoute,
         ...getRouteComponents(route, routeModule, isSpaMode),
+<<<<<<< HEAD
         unstable_middleware: routeModule.unstable_clientMiddleware,
+=======
+>>>>>>> books_newbutton
         handle: routeModule.handle,
         shouldRevalidate: getShouldRevalidateFunction(
           routeModule,
@@ -7651,7 +8047,11 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
       let hasInitialError = initialState && initialState.errors && route.id in initialState.errors;
       let initialError = hasInitialError ? (_b = initialState == null ? void 0 : initialState.errors) == null ? void 0 : _b[route.id] : void 0;
       let isHydrationRequest = needsRevalidation == null && (((_c = routeModule.clientLoader) == null ? void 0 : _c.hydrate) === true || !route.hasLoader);
+<<<<<<< HEAD
       dataRoute.loader = async ({ request, params, context }, singleFetch) => {
+=======
+      dataRoute.loader = async ({ request, params }, singleFetch) => {
+>>>>>>> books_newbutton
         try {
           let result = await prefetchStylesAndCallHandler(async () => {
             invariant2(
@@ -7664,7 +8064,10 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
             return routeModule.clientLoader({
               request,
               params,
+<<<<<<< HEAD
               context,
+=======
+>>>>>>> books_newbutton
               async serverLoader() {
                 preventInvalidServerHandlerCall("loader", route);
                 if (isHydrationRequest) {
@@ -7689,7 +8092,11 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
         routeModule,
         isSpaMode
       );
+<<<<<<< HEAD
       dataRoute.action = ({ request, params, context }, singleFetch) => {
+=======
+      dataRoute.action = ({ request, params }, singleFetch) => {
+>>>>>>> books_newbutton
         return prefetchStylesAndCallHandler(async () => {
           invariant2(
             routeModule,
@@ -7704,7 +8111,10 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
           return routeModule.clientAction({
             request,
             params,
+<<<<<<< HEAD
             context,
+=======
+>>>>>>> books_newbutton
             async serverAction() {
               preventInvalidServerHandlerCall("action", route);
               return fetchServerAction(singleFetch);
@@ -7714,7 +8124,11 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
       };
     } else {
       if (!route.hasClientLoader) {
+<<<<<<< HEAD
         dataRoute.loader = (_, singleFetch) => prefetchStylesAndCallHandler(() => {
+=======
+        dataRoute.loader = ({ request }, singleFetch) => prefetchStylesAndCallHandler(() => {
+>>>>>>> books_newbutton
           return fetchServerLoader(singleFetch);
         });
       } else if (route.clientLoaderModule) {
@@ -7735,7 +8149,11 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
         };
       }
       if (!route.hasClientAction) {
+<<<<<<< HEAD
         dataRoute.action = (_, singleFetch) => prefetchStylesAndCallHandler(() => {
+=======
+        dataRoute.action = ({ request }, singleFetch) => prefetchStylesAndCallHandler(() => {
+>>>>>>> books_newbutton
           if (isSpaMode) {
             throw noActionDefinedError("clientAction", route.id);
           }
@@ -7793,7 +8211,10 @@ function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSp
         return {
           ...lazyRoute.loader ? { loader: lazyRoute.loader } : {},
           ...lazyRoute.action ? { action: lazyRoute.action } : {},
+<<<<<<< HEAD
           unstable_middleware: mod.unstable_clientMiddleware,
+=======
+>>>>>>> books_newbutton
           hasErrorBoundary: lazyRoute.hasErrorBoundary,
           shouldRevalidate: getShouldRevalidateFunction(
             lazyRoute,
@@ -7866,7 +8287,10 @@ async function loadRouteModuleWithBlockingLinks(route, routeModules) {
   return {
     Component: getRouteModuleComponent(routeModule),
     ErrorBoundary: routeModule.ErrorBoundary,
+<<<<<<< HEAD
     unstable_clientMiddleware: routeModule.unstable_clientMiddleware,
+=======
+>>>>>>> books_newbutton
     clientAction: routeModule.clientAction,
     clientLoader: routeModule.clientLoader,
     handle: routeModule.handle,
@@ -7920,13 +8344,20 @@ function getPatchRoutesOnNavigationFunction(manifest, routeModules, ssr, isSpaMo
   if (!isFogOfWarEnabled(ssr)) {
     return void 0;
   }
+<<<<<<< HEAD
   return async ({ path, patch, signal, fetcherKey }) => {
+=======
+  return async ({ path, patch, signal }) => {
+>>>>>>> books_newbutton
     if (discoveredPaths.has(path)) {
       return;
     }
     await fetchAndApplyManifestPatches(
       [path],
+<<<<<<< HEAD
       fetcherKey ? window.location.href : path,
+=======
+>>>>>>> books_newbutton
       manifest,
       routeModules,
       ssr,
@@ -7968,7 +8399,10 @@ function useFogOFWarDiscovery(router2, manifest, routeModules, ssr, isSpaMode) {
       try {
         await fetchAndApplyManifestPatches(
           lazyPaths,
+<<<<<<< HEAD
           null,
+=======
+>>>>>>> books_newbutton
           manifest,
           routeModules,
           ssr,
@@ -7992,8 +8426,12 @@ function useFogOFWarDiscovery(router2, manifest, routeModules, ssr, isSpaMode) {
     return () => observer.disconnect();
   }, [ssr, isSpaMode, manifest, routeModules, router2]);
 }
+<<<<<<< HEAD
 var MANIFEST_VERSION_STORAGE_KEY = "react-router-manifest-version";
 async function fetchAndApplyManifestPatches(paths, errorReloadPath, manifest, routeModules, ssr, isSpaMode, basename, patchRoutes, signal) {
+=======
+async function fetchAndApplyManifestPatches(paths, manifest, routeModules, ssr, isSpaMode, basename, patchRoutes, signal) {
+>>>>>>> books_newbutton
   let manifestPath = `${basename != null ? basename : "/"}/__manifest`.replace(
     /\/+/g,
     "/"
@@ -8010,6 +8448,7 @@ async function fetchAndApplyManifestPatches(paths, errorReloadPath, manifest, ro
     let res = await fetch(url, { signal });
     if (!res.ok) {
       throw new Error(`${res.status} ${res.statusText}`);
+<<<<<<< HEAD
     } else if (res.status === 204 && res.headers.has("X-Remix-Reload-Document")) {
       if (!errorReloadPath) {
         console.warn(
@@ -8030,6 +8469,11 @@ async function fetchAndApplyManifestPatches(paths, errorReloadPath, manifest, ro
       throw new Error(await res.text());
     }
     sessionStorage.removeItem(MANIFEST_VERSION_STORAGE_KEY);
+=======
+    } else if (res.status >= 400) {
+      throw new Error(await res.text());
+    }
+>>>>>>> books_newbutton
     serverPatches = await res.json();
   } catch (e) {
     if (signal == null ? void 0 : signal.aborted) return;
@@ -8181,7 +8625,11 @@ function Links() {
     () => getKeyedLinksForMatches(matches, routeModules, manifest),
     [matches, routeModules, manifest]
   );
+<<<<<<< HEAD
   return React9.createElement(React9.Fragment, null, typeof criticalCss === "string" ? React9.createElement("style", { dangerouslySetInnerHTML: { __html: criticalCss } }) : null, typeof criticalCss === "object" ? React9.createElement("link", { rel: "stylesheet", href: criticalCss.href }) : null, keyedLinks.map(
+=======
+  return React9.createElement(React9.Fragment, null, criticalCss ? React9.createElement("style", { dangerouslySetInnerHTML: { __html: criticalCss } }) : null, keyedLinks.map(
+>>>>>>> books_newbutton
     ({ key, link }) => isPageLinkDescriptor(link) ? React9.createElement(PrefetchPageLinks, { key, ...link }) : React9.createElement("link", { key, ...link })
   ));
 }
@@ -8224,7 +8672,10 @@ function PrefetchPageLinksImpl({
 }) {
   let location = useLocation();
   let { manifest, routeModules } = useFrameworkContext();
+<<<<<<< HEAD
   let { basename } = useDataRouterContext2();
+=======
+>>>>>>> books_newbutton
   let { loaderData, matches } = useDataRouterStateContext();
   let newMatchesForData = React9.useMemo(
     () => getNewMatchesForLinks(
@@ -8271,7 +8722,11 @@ function PrefetchPageLinksImpl({
     if (routesParams.size === 0) {
       return [];
     }
+<<<<<<< HEAD
     let url = singleFetchUrl(page, basename);
+=======
+    let url = singleFetchUrl(page);
+>>>>>>> books_newbutton
     if (foundOptOutRoute && routesParams.size > 0) {
       url.searchParams.set(
         "_routes",
@@ -8280,7 +8735,10 @@ function PrefetchPageLinksImpl({
     }
     return [url.pathname + url.search];
   }, [
+<<<<<<< HEAD
     basename,
+=======
+>>>>>>> books_newbutton
     loaderData,
     location,
     manifest,
@@ -8533,14 +8991,21 @@ function mergeRefs(...refs) {
 var isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined" && typeof window.document.createElement !== "undefined";
 try {
   if (isBrowser) {
+<<<<<<< HEAD
     window.__reactRouterVersion = "7.4.0";
+=======
+    window.__reactRouterVersion = "7.2.0";
+>>>>>>> books_newbutton
   }
 } catch (e) {
 }
 function createBrowserRouter(routes, opts) {
   return createRouter({
     basename: opts == null ? void 0 : opts.basename,
+<<<<<<< HEAD
     unstable_getContext: opts == null ? void 0 : opts.unstable_getContext,
+=======
+>>>>>>> books_newbutton
     future: opts == null ? void 0 : opts.future,
     history: createBrowserHistory({ window: opts == null ? void 0 : opts.window }),
     hydrationData: (opts == null ? void 0 : opts.hydrationData) || parseHydrationData(),
@@ -8554,7 +9019,10 @@ function createBrowserRouter(routes, opts) {
 function createHashRouter(routes, opts) {
   return createRouter({
     basename: opts == null ? void 0 : opts.basename,
+<<<<<<< HEAD
     unstable_getContext: opts == null ? void 0 : opts.unstable_getContext,
+=======
+>>>>>>> books_newbutton
     future: opts == null ? void 0 : opts.future,
     history: createHashHistory({ window: opts == null ? void 0 : opts.window }),
     hydrationData: (opts == null ? void 0 : opts.hydrationData) || parseHydrationData(),
@@ -9528,7 +9996,10 @@ function createStaticRouter(routes, context, opts = {}) {
     },
     get future() {
       return {
+<<<<<<< HEAD
         unstable_middleware: false,
+=======
+>>>>>>> books_newbutton
         ...opts == null ? void 0 : opts.future
       };
     },
@@ -9685,7 +10156,11 @@ function ServerRouter({
     }
   )) : null);
 }
+<<<<<<< HEAD
 function createRoutesStub(routes, unstable_getContext) {
+=======
+function createRoutesStub(routes, context = {}) {
+>>>>>>> books_newbutton
   return function RoutesTestStub({
     initialEntries,
     initialIndex,
@@ -9696,9 +10171,13 @@ function createRoutesStub(routes, unstable_getContext) {
     let remixContextRef = React13.useRef();
     if (routerRef.current == null) {
       remixContextRef.current = {
+<<<<<<< HEAD
         future: {
           unstable_middleware: (future == null ? void 0 : future.unstable_middleware) === true
         },
+=======
+        future: {},
+>>>>>>> books_newbutton
         manifest: {
           routes: {},
           entry: { imports: [], module: "" },
@@ -9710,14 +10189,23 @@ function createRoutesStub(routes, unstable_getContext) {
         isSpaMode: false
       };
       let patched = processRoutes(
+<<<<<<< HEAD
         // @ts-expect-error `StubRouteObject` is stricter about `loader`/`action`
         // types compared to `AgnosticRouteObject`
         convertRoutesToDataRoutes(routes, (r) => r),
+=======
+        // @ts-expect-error loader/action context types don't match :/
+        convertRoutesToDataRoutes(routes, (r) => r),
+        context,
+>>>>>>> books_newbutton
         remixContextRef.current.manifest,
         remixContextRef.current.routeModules
       );
       routerRef.current = createMemoryRouter(patched, {
+<<<<<<< HEAD
         unstable_getContext,
+=======
+>>>>>>> books_newbutton
         initialEntries,
         initialIndex,
         hydrationData
@@ -9726,13 +10214,21 @@ function createRoutesStub(routes, unstable_getContext) {
     return React13.createElement(FrameworkContext.Provider, { value: remixContextRef.current }, React13.createElement(RouterProvider, { router: routerRef.current }));
   };
 }
+<<<<<<< HEAD
 function processRoutes(routes, manifest, routeModules, parentId) {
+=======
+function processRoutes(routes, context, manifest, routeModules, parentId) {
+>>>>>>> books_newbutton
   return routes.map((route) => {
     if (!route.id) {
       throw new Error(
         "Expected a route.id in @remix-run/testing processRoutes() function"
       );
     }
+<<<<<<< HEAD
+=======
+    let { loader, action } = route;
+>>>>>>> books_newbutton
     let newRoute = {
       id: route.id,
       path: route.path,
@@ -9740,8 +10236,13 @@ function processRoutes(routes, manifest, routeModules, parentId) {
       Component: route.Component,
       HydrateFallback: route.HydrateFallback,
       ErrorBoundary: route.ErrorBoundary,
+<<<<<<< HEAD
       action: route.action,
       loader: route.loader,
+=======
+      action: action ? (args) => action({ ...args, context }) : void 0,
+      loader: loader ? (args) => loader({ ...args, context }) : void 0,
+>>>>>>> books_newbutton
       handle: route.handle,
       shouldRevalidate: route.shouldRevalidate
     };
@@ -9776,6 +10277,10 @@ function processRoutes(routes, manifest, routeModules, parentId) {
     if (route.children) {
       newRoute.children = processRoutes(
         route.children,
+<<<<<<< HEAD
+=======
+        context,
+>>>>>>> books_newbutton
         manifest,
         routeModules,
         newRoute.id
@@ -10115,7 +10620,10 @@ function createStaticHandlerDataRoutes(manifest, future, parentId = "", routesBy
       hasErrorBoundary: route.id === "root" || route.module.ErrorBoundary != null,
       id: route.id,
       path: route.path,
+<<<<<<< HEAD
       unstable_middleware: route.module.unstable_middleware,
+=======
+>>>>>>> books_newbutton
       // Need to use RR's version in the param typed here to permit the optional
       // context even though we know it'll always be provided in remix
       loader: route.module.loader ? async (args) => {
@@ -10247,6 +10755,7 @@ function prependCookies(parentHeaders, childHeaders) {
     });
   }
 }
+<<<<<<< HEAD
 var NO_BODY_STATUS_CODES = /* @__PURE__ */ new Set([100, 101, 204, 205, 304]);
 var SINGLE_FETCH_REDIRECT_STATUS = 202;
 async function singleFetchAction(build, serverMode, staticHandler, request, handlerUrl, loadContext, handleError) {
@@ -10287,6 +10796,29 @@ async function singleFetchAction(build, serverMode, staticHandler, request, hand
       });
     };
     var respond = respond2;
+=======
+var SINGLE_FETCH_REDIRECT_STATUS = 202;
+function getSingleFetchDataStrategy2({
+  isActionDataRequest,
+  loadRouteIds
+} = {}) {
+  return async ({ request, matches }) => {
+    if (isActionDataRequest && request.method === "GET") {
+      return {};
+    }
+    let matchesToLoad = loadRouteIds ? matches.filter((m) => loadRouteIds.includes(m.route.id)) : matches;
+    let results = await Promise.all(
+      matchesToLoad.map((match) => match.resolve())
+    );
+    return results.reduce(
+      (acc, result, i) => Object.assign(acc, { [matchesToLoad[i].route.id]: result }),
+      {}
+    );
+  };
+}
+async function singleFetchAction(build, serverMode, staticHandler, request, handlerUrl, loadContext, handleError) {
+  try {
+>>>>>>> books_newbutton
     let handlerRequest = new Request(handlerUrl, {
       method: request.method,
       body: request.body,
@@ -10297,6 +10829,7 @@ async function singleFetchAction(build, serverMode, staticHandler, request, hand
     let result = await staticHandler.query(handlerRequest, {
       requestContext: loadContext,
       skipLoaderErrorBubbling: true,
+<<<<<<< HEAD
       skipRevalidation: true,
       unstable_respond: respond2
     });
@@ -10305,6 +10838,14 @@ async function singleFetchAction(build, serverMode, staticHandler, request, hand
     }
     if (isRedirectResponse(result)) {
       return generateSingleFetchResponse(request, build, serverMode, {
+=======
+      dataStrategy: getSingleFetchDataStrategy2({
+        isActionDataRequest: true
+      })
+    });
+    if (isResponse(result)) {
+      return {
+>>>>>>> books_newbutton
         result: getSingleFetchRedirect(
           result.status,
           result.headers,
@@ -10312,6 +10853,7 @@ async function singleFetchAction(build, serverMode, staticHandler, request, hand
         ),
         headers: result.headers,
         status: SINGLE_FETCH_REDIRECT_STATUS
+<<<<<<< HEAD
       });
     }
     return result;
@@ -10372,10 +10914,59 @@ async function singleFetchLoaders(build, serverMode, staticHandler, request, han
       });
     };
     var respond = respond2;
+=======
+      };
+    }
+    let context = result;
+    let headers = getDocumentHeaders(build, context);
+    if (isRedirectStatusCode(context.statusCode) && headers.has("Location")) {
+      return {
+        result: getSingleFetchRedirect(
+          context.statusCode,
+          headers,
+          build.basename
+        ),
+        headers,
+        status: SINGLE_FETCH_REDIRECT_STATUS
+      };
+    }
+    if (context.errors) {
+      Object.values(context.errors).forEach((err) => {
+        if (!isRouteErrorResponse(err) || err.error) {
+          handleError(err);
+        }
+      });
+      context.errors = sanitizeErrors(context.errors, serverMode);
+    }
+    let singleFetchResult;
+    if (context.errors) {
+      singleFetchResult = { error: Object.values(context.errors)[0] };
+    } else {
+      singleFetchResult = { data: Object.values(context.actionData || {})[0] };
+    }
+    return {
+      result: singleFetchResult,
+      headers,
+      status: context.statusCode
+    };
+  } catch (error) {
+    handleError(error);
+    return {
+      result: { error },
+      headers: new Headers(),
+      status: 500
+    };
+  }
+}
+async function singleFetchLoaders(build, serverMode, staticHandler, request, handlerUrl, loadContext, handleError) {
+  var _a;
+  try {
+>>>>>>> books_newbutton
     let handlerRequest = new Request(handlerUrl, {
       headers: request.headers,
       signal: request.signal
     });
+<<<<<<< HEAD
     let routesParam = new URL(request.url).searchParams.get("_routes");
     let loadRouteIds = routesParam ? new Set(routesParam.split(",")) : null;
     let result = await staticHandler.query(handlerRequest, {
@@ -10389,6 +10980,18 @@ async function singleFetchLoaders(build, serverMode, staticHandler, request, han
     }
     if (isRedirectResponse(result)) {
       return generateSingleFetchResponse(request, build, serverMode, {
+=======
+    let loadRouteIds = ((_a = new URL(request.url).searchParams.get("_routes")) == null ? void 0 : _a.split(",")) || void 0;
+    let result = await staticHandler.query(handlerRequest, {
+      requestContext: loadContext,
+      skipLoaderErrorBubbling: true,
+      dataStrategy: getSingleFetchDataStrategy2({
+        loadRouteIds
+      })
+    });
+    if (isResponse(result)) {
+      return {
+>>>>>>> books_newbutton
         result: {
           [SingleFetchRedirectSymbol]: getSingleFetchRedirect(
             result.status,
@@ -10398,6 +11001,7 @@ async function singleFetchLoaders(build, serverMode, staticHandler, request, han
         },
         headers: result.headers,
         status: SINGLE_FETCH_REDIRECT_STATUS
+<<<<<<< HEAD
       });
     }
     return result;
@@ -10434,6 +11038,59 @@ function generateSingleFetchResponse(request, build, serverMode, {
     }
   );
 }
+=======
+      };
+    }
+    let context = result;
+    let headers = getDocumentHeaders(build, context);
+    if (isRedirectStatusCode(context.statusCode) && headers.has("Location")) {
+      return {
+        result: {
+          [SingleFetchRedirectSymbol]: getSingleFetchRedirect(
+            context.statusCode,
+            headers,
+            build.basename
+          )
+        },
+        headers,
+        status: SINGLE_FETCH_REDIRECT_STATUS
+      };
+    }
+    if (context.errors) {
+      Object.values(context.errors).forEach((err) => {
+        if (!isRouteErrorResponse(err) || err.error) {
+          handleError(err);
+        }
+      });
+      context.errors = sanitizeErrors(context.errors, serverMode);
+    }
+    let results = {};
+    let loadedMatches = loadRouteIds ? context.matches.filter(
+      (m) => m.route.loader && loadRouteIds.includes(m.route.id)
+    ) : context.matches;
+    loadedMatches.forEach((m) => {
+      let { id } = m.route;
+      if (context.errors && context.errors.hasOwnProperty(id)) {
+        results[id] = { error: context.errors[id] };
+      } else if (context.loaderData.hasOwnProperty(id)) {
+        results[id] = { data: context.loaderData[id] };
+      }
+    });
+    return {
+      result: results,
+      headers,
+      status: context.statusCode
+    };
+  } catch (error) {
+    handleError(error);
+    return {
+      result: { root: { error } },
+      headers: new Headers(),
+      status: 500
+    };
+  }
+}
+>>>>>>> books_newbutton
 function getSingleFetchRedirect(status, headers, basename) {
   let redirect2 = headers.get("Location");
   if (basename) {
@@ -10493,6 +11150,10 @@ function encodeViaTurboStream(data2, requestSignal, streamTimeout, serverMode) {
     ]
   });
 }
+<<<<<<< HEAD
+=======
+var NO_BODY_STATUS_CODES = /* @__PURE__ */ new Set([100, 101, 204, 205, 304]);
+>>>>>>> books_newbutton
 function derive(build, mode) {
   let routes = createRoutes(build.routes);
   let dataRoutes = createStaticHandlerDataRoutes(build.routes, build.future);
@@ -10522,12 +11183,18 @@ var createRequestHandler = (build, mode) => {
   let serverMode;
   let staticHandler;
   let errorHandler;
+<<<<<<< HEAD
   return async function requestHandler(request, initialContext) {
     var _a, _b, _c;
     _build = typeof build === "function" ? await build() : build;
     let loadContext = _build.future.unstable_middleware ? new unstable_RouterContextProvider(
       initialContext
     ) : initialContext || {};
+=======
+  return async function requestHandler(request, loadContext = {}) {
+    var _a, _b;
+    _build = typeof build === "function" ? await build() : build;
+>>>>>>> books_newbutton
     if (typeof build === "function") {
       let derived = derive(_build, mode);
       routes = derived.routes;
@@ -10542,6 +11209,7 @@ var createRequestHandler = (build, mode) => {
       errorHandler = derived.errorHandler;
     }
     let url = new URL(request.url);
+<<<<<<< HEAD
     let normalizedBasename = _build.basename || "/";
     let normalizedPath = url.pathname;
     if (stripBasename(normalizedPath, normalizedBasename) === "/_root.data") {
@@ -10550,6 +11218,10 @@ var createRequestHandler = (build, mode) => {
       normalizedPath = normalizedPath.replace(/\.data$/, "");
     }
     if (stripBasename(normalizedPath, normalizedBasename) !== "/" && normalizedPath.endsWith("/")) {
+=======
+    let normalizedPath = url.pathname.replace(/\.data$/, "").replace(/^\/_root$/, "/");
+    if (normalizedPath !== "/" && normalizedPath.endsWith("/")) {
+>>>>>>> books_newbutton
       normalizedPath = normalizedPath.slice(0, -1);
     }
     let params = {};
@@ -10590,7 +11262,14 @@ var createRequestHandler = (build, mode) => {
         }
       }
     }
+<<<<<<< HEAD
     let manifestUrl = `${normalizedBasename}/__manifest`.replace(/\/+/g, "/");
+=======
+    let manifestUrl = `${_build.basename ?? "/"}/__manifest`.replace(
+      /\/+/g,
+      "/"
+    );
+>>>>>>> books_newbutton
     if (url.pathname === manifestUrl) {
       try {
         let res = await handleManifestRequest(_build, routes, url);
@@ -10655,10 +11334,16 @@ var createRequestHandler = (build, mode) => {
           );
         }
       }
+<<<<<<< HEAD
     } else if (!request.headers.has("X-React-Router-SPA-Mode") && matches && matches[matches.length - 1].route.module.default == null && matches[matches.length - 1].route.module.ErrorBoundary == null) {
       response = await handleResourceRequest(
         serverMode,
         _build,
+=======
+    } else if (matches && matches[matches.length - 1].route.module.default == null && matches[matches.length - 1].route.module.ErrorBoundary == null) {
+      response = await handleResourceRequest(
+        serverMode,
+>>>>>>> books_newbutton
         staticHandler,
         matches.slice(-1)[0].route.id,
         request,
@@ -10666,6 +11351,7 @@ var createRequestHandler = (build, mode) => {
         handleError
       );
     } else {
+<<<<<<< HEAD
       let { pathname } = url;
       let criticalCss = void 0;
       if (_build.unstable_getCriticalCss) {
@@ -10673,6 +11359,9 @@ var createRequestHandler = (build, mode) => {
       } else if (mode === "development" && ((_a = getDevServerHooks()) == null ? void 0 : _a.getCriticalCss)) {
         criticalCss = await ((_c = (_b = getDevServerHooks()) == null ? void 0 : _b.getCriticalCss) == null ? void 0 : _c.call(_b, pathname));
       }
+=======
+      let criticalCss = mode === "development" ? await ((_b = (_a = getDevServerHooks()) == null ? void 0 : _a.getCriticalCss) == null ? void 0 : _b.call(_a, _build, url.pathname)) : void 0;
+>>>>>>> books_newbutton
       response = await handleDocumentRequest(
         serverMode,
         _build,
@@ -10694,6 +11383,7 @@ var createRequestHandler = (build, mode) => {
   };
 };
 async function handleManifestRequest(build, routes, url) {
+<<<<<<< HEAD
   if (build.assets.version !== url.searchParams.get("version")) {
     return new Response(null, {
       status: 204,
@@ -10716,6 +11406,11 @@ async function handleManifestRequest(build, routes, url) {
       });
     });
     for (let path of paths) {
+=======
+  let patches = {};
+  if (url.searchParams.has("p")) {
+    for (let path of url.searchParams.getAll("p")) {
+>>>>>>> books_newbutton
       let matches = matchServerRoutes(routes, path, build.basename);
       if (matches) {
         for (let match of matches) {
@@ -10736,7 +11431,11 @@ async function handleManifestRequest(build, routes, url) {
   return new Response("Invalid Request", { status: 400 });
 }
 async function handleSingleFetchRequest(serverMode, build, staticHandler, request, handlerUrl, loadContext, handleError) {
+<<<<<<< HEAD
   let response = request.method !== "GET" ? await singleFetchAction(
+=======
+  let { result, headers, status } = request.method !== "GET" ? await singleFetchAction(
+>>>>>>> books_newbutton
     build,
     serverMode,
     staticHandler,
@@ -10753,6 +11452,7 @@ async function handleSingleFetchRequest(serverMode, build, staticHandler, reques
     loadContext,
     handleError
   );
+<<<<<<< HEAD
   return response;
 }
 async function handleDocumentRequest(serverMode, build, staticHandler, request, loadContext, handleError, criticalCss) {
@@ -10763,10 +11463,39 @@ async function handleDocumentRequest(serverMode, build, staticHandler, request, 
       unstable_respond: build.future.unstable_middleware ? (ctx) => renderHtml(ctx, isSpaMode) : void 0
     });
     return isResponse(response) ? response : renderHtml(response, isSpaMode);
+=======
+  let resultHeaders = new Headers(headers);
+  resultHeaders.set("X-Remix-Response", "yes");
+  if (NO_BODY_STATUS_CODES.has(status)) {
+    return new Response(null, { status, headers: resultHeaders });
+  }
+  resultHeaders.set("Content-Type", "text/x-script");
+  return new Response(
+    encodeViaTurboStream(
+      result,
+      request.signal,
+      build.entry.module.streamTimeout,
+      serverMode
+    ),
+    {
+      status: status || 200,
+      headers: resultHeaders
+    }
+  );
+}
+async function handleDocumentRequest(serverMode, build, staticHandler, request, loadContext, handleError, criticalCss) {
+  let isSpaMode = request.headers.has("X-React-Router-SPA-Mode");
+  let context;
+  try {
+    context = await staticHandler.query(request, {
+      requestContext: loadContext
+    });
+>>>>>>> books_newbutton
   } catch (error) {
     handleError(error);
     return new Response(null, { status: 500 });
   }
+<<<<<<< HEAD
   async function renderHtml(context, isSpaMode2) {
     if (isResponse(context)) {
       return context;
@@ -10784,10 +11513,89 @@ async function handleDocumentRequest(serverMode, build, staticHandler, request, 
       context.errors = sanitizeErrors(context.errors, serverMode);
     }
     let state = {
+=======
+  if (isResponse(context)) {
+    return context;
+  }
+  let headers = getDocumentHeaders(build, context);
+  if (NO_BODY_STATUS_CODES.has(context.statusCode)) {
+    return new Response(null, { status: context.statusCode, headers });
+  }
+  if (context.errors) {
+    Object.values(context.errors).forEach((err) => {
+      if (!isRouteErrorResponse(err) || err.error) {
+        handleError(err);
+      }
+    });
+    context.errors = sanitizeErrors(context.errors, serverMode);
+  }
+  let state = {
+    loaderData: context.loaderData,
+    actionData: context.actionData,
+    errors: serializeErrors2(context.errors, serverMode)
+  };
+  let entryContext = {
+    manifest: build.assets,
+    routeModules: createEntryRouteModules(build.routes),
+    staticHandlerContext: context,
+    criticalCss,
+    serverHandoffString: createServerHandoffString({
+      basename: build.basename,
+      criticalCss,
+      future: build.future,
+      ssr: build.ssr,
+      isSpaMode
+    }),
+    serverHandoffStream: encodeViaTurboStream(
+      state,
+      request.signal,
+      build.entry.module.streamTimeout,
+      serverMode
+    ),
+    renderMeta: {},
+    future: build.future,
+    ssr: build.ssr,
+    isSpaMode,
+    serializeError: (err) => serializeError(err, serverMode)
+  };
+  let handleDocumentRequestFunction = build.entry.module.default;
+  try {
+    return await handleDocumentRequestFunction(
+      request,
+      context.statusCode,
+      headers,
+      entryContext,
+      loadContext
+    );
+  } catch (error) {
+    handleError(error);
+    let errorForSecondRender = error;
+    if (isResponse(error)) {
+      try {
+        let data2 = await unwrapResponse(error);
+        errorForSecondRender = new ErrorResponseImpl(
+          error.status,
+          error.statusText,
+          data2
+        );
+      } catch (e) {
+      }
+    }
+    context = getStaticContextFromError(
+      staticHandler.dataRoutes,
+      context,
+      errorForSecondRender
+    );
+    if (context.errors) {
+      context.errors = sanitizeErrors(context.errors, serverMode);
+    }
+    let state2 = {
+>>>>>>> books_newbutton
       loaderData: context.loaderData,
       actionData: context.actionData,
       errors: serializeErrors2(context.errors, serverMode)
     };
+<<<<<<< HEAD
     let entryContext = {
       manifest: build.assets,
       routeModules: createEntryRouteModules(build.routes),
@@ -10802,10 +11610,24 @@ async function handleDocumentRequest(serverMode, build, staticHandler, request, 
       }),
       serverHandoffStream: encodeViaTurboStream(
         state,
+=======
+    entryContext = {
+      ...entryContext,
+      staticHandlerContext: context,
+      serverHandoffString: createServerHandoffString({
+        basename: build.basename,
+        future: build.future,
+        ssr: build.ssr,
+        isSpaMode
+      }),
+      serverHandoffStream: encodeViaTurboStream(
+        state2,
+>>>>>>> books_newbutton
         request.signal,
         build.entry.module.streamTimeout,
         serverMode
       ),
+<<<<<<< HEAD
       renderMeta: {},
       future: build.future,
       ssr: build.ssr,
@@ -10813,6 +11635,10 @@ async function handleDocumentRequest(serverMode, build, staticHandler, request, 
       serializeError: (err) => serializeError(err, serverMode)
     };
     let handleDocumentRequestFunction = build.entry.module.default;
+=======
+      renderMeta: {}
+    };
+>>>>>>> books_newbutton
     try {
       return await handleDocumentRequestFunction(
         request,
@@ -10821,6 +11647,7 @@ async function handleDocumentRequest(serverMode, build, staticHandler, request, 
         entryContext,
         loadContext
       );
+<<<<<<< HEAD
     } catch (error) {
       handleError(error);
       let errorForSecondRender = error;
@@ -10886,6 +11713,19 @@ async function handleResourceRequest(serverMode, build, staticHandler, routeId, 
       routeId,
       requestContext: loadContext,
       unstable_respond: build.future.unstable_middleware ? (ctx) => ctx : void 0
+=======
+    } catch (error2) {
+      handleError(error2);
+      return returnLastResortErrorResponse(error2, serverMode);
+    }
+  }
+}
+async function handleResourceRequest(serverMode, staticHandler, routeId, request, loadContext, handleError) {
+  try {
+    let response = await staticHandler.queryRoute(request, {
+      routeId,
+      requestContext: loadContext
+>>>>>>> books_newbutton
     });
     if (isResponse(response)) {
       return response;
@@ -10905,6 +11745,7 @@ async function handleResourceRequest(serverMode, build, staticHandler, routeId, 
       }
       return errorResponseToJson(error, serverMode);
     }
+<<<<<<< HEAD
     if (error instanceof Error && error.message === "Expected a response from queryRoute") {
       let newError = new Error(
         "Expected a Response to be returned from resource route handler"
@@ -10912,6 +11753,8 @@ async function handleResourceRequest(serverMode, build, staticHandler, routeId, 
       handleError(newError);
       return returnLastResortErrorResponse(newError, serverMode);
     }
+=======
+>>>>>>> books_newbutton
     handleError(error);
     return returnLastResortErrorResponse(error, serverMode);
   }
@@ -11157,10 +12000,15 @@ function initSsrInfo() {
     };
   }
 }
+<<<<<<< HEAD
 function createHydratedRouter({
   unstable_getContext
 }) {
   var _a, _b;
+=======
+function createHydratedRouter() {
+  var _a;
+>>>>>>> books_newbutton
   initSsrInfo();
   if (!ssrInfo) {
     throw new Error(
@@ -11195,6 +12043,7 @@ function createHydratedRouter({
   let hydrationData = void 0;
   let loaderData = ssrInfo.context.state.loaderData;
   if (ssrInfo.context.isSpaMode) {
+<<<<<<< HEAD
     if (((_a = ssrInfo.manifest.routes.root) == null ? void 0 : _a.hasLoader) && loaderData && "root" in loaderData) {
       hydrationData = {
         loaderData: {
@@ -11202,6 +12051,9 @@ function createHydratedRouter({
         }
       };
     }
+=======
+    hydrationData = { loaderData };
+>>>>>>> books_newbutton
   } else {
     hydrationData = {
       ...ssrInfo.context.state,
@@ -11210,7 +12062,11 @@ function createHydratedRouter({
     let initialMatches = matchRoutes(
       routes,
       window.location,
+<<<<<<< HEAD
       (_b = window.__reactRouterContext) == null ? void 0 : _b.basename
+=======
+      (_a = window.__reactRouterContext) == null ? void 0 : _a.basename
+>>>>>>> books_newbutton
     );
     if (initialMatches) {
       for (let match of initialMatches) {
@@ -11236,17 +12092,25 @@ function createHydratedRouter({
     routes,
     history: createBrowserHistory(),
     basename: ssrInfo.context.basename,
+<<<<<<< HEAD
     unstable_getContext,
     hydrationData,
     mapRouteProperties,
     future: {
       unstable_middleware: ssrInfo.context.future.unstable_middleware
     },
+=======
+    hydrationData,
+    mapRouteProperties,
+>>>>>>> books_newbutton
     dataStrategy: getSingleFetchDataStrategy(
       ssrInfo.manifest,
       ssrInfo.routeModules,
       ssrInfo.context.ssr,
+<<<<<<< HEAD
       ssrInfo.context.basename,
+=======
+>>>>>>> books_newbutton
       () => router2
     ),
     patchRoutesOnNavigation: getPatchRoutesOnNavigationFunction(
@@ -11267,11 +12131,17 @@ function createHydratedRouter({
   window.__reactRouterDataRouter = router2;
   return router2;
 }
+<<<<<<< HEAD
 function HydratedRouter(props) {
   if (!router) {
     router = createHydratedRouter({
       unstable_getContext: props.unstable_getContext
     });
+=======
+function HydratedRouter() {
+  if (!router) {
+    router = createHydratedRouter();
+>>>>>>> books_newbutton
   }
   let [criticalCss, setCriticalCss] = React22.useState(
     true ? ssrInfo == null ? void 0 : ssrInfo.context.criticalCss : void 0
@@ -11407,8 +12277,11 @@ export {
   replace,
   resolvePath,
   HistoryRouter as unstable_HistoryRouter,
+<<<<<<< HEAD
   unstable_RouterContextProvider,
   unstable_createContext,
+=======
+>>>>>>> books_newbutton
   setDevServerHooks as unstable_setDevServerHooks,
   usePrompt as unstable_usePrompt,
   useActionData,
@@ -11443,9 +12316,15 @@ export {
 };
 /*! Bundled license information:
 
+<<<<<<< HEAD
 react-router/dist/development/chunk-GNGMS2XR.mjs:
   (**
    * react-router v7.4.0
+=======
+react-router/dist/development/chunk-HA7DTUK3.mjs:
+  (**
+   * react-router v7.2.0
+>>>>>>> books_newbutton
    *
    * Copyright (c) Remix Software Inc.
    *
@@ -11457,7 +12336,11 @@ react-router/dist/development/chunk-GNGMS2XR.mjs:
 
 react-router/dist/development/dom-export.mjs:
   (**
+<<<<<<< HEAD
    * react-router v7.4.0
+=======
+   * react-router v7.2.0
+>>>>>>> books_newbutton
    *
    * Copyright (c) Remix Software Inc.
    *
@@ -11469,7 +12352,11 @@ react-router/dist/development/dom-export.mjs:
 
 react-router/dist/development/index.mjs:
   (**
+<<<<<<< HEAD
    * react-router v7.4.0
+=======
+   * react-router v7.2.0
+>>>>>>> books_newbutton
    *
    * Copyright (c) Remix Software Inc.
    *
@@ -11481,7 +12368,11 @@ react-router/dist/development/index.mjs:
 
 react-router-dom/dist/index.mjs:
   (**
+<<<<<<< HEAD
    * react-router-dom v7.4.0
+=======
+   * react-router-dom v7.2.0
+>>>>>>> books_newbutton
    *
    * Copyright (c) Remix Software Inc.
    *

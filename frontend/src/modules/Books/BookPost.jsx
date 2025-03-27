@@ -1,22 +1,26 @@
+// Component for posting a new book to the exchange
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 
 const BookPost = () => {
+  // Hook for programmatic navigation
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState({ text: "", type: "" });
+
+  // State variables
+  const [loading, setLoading] = useState(true); // Loading state for initial render
+  const [message, setMessage] = useState({ text: "", type: "" }); // Success/error messages
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    location: "",
-    cost: "",
-    image: null,
-    owner_name: "",
+    title: "", // Book title
+    description: "", // Book description
+    location: "", // Location for exchange
+    cost: "", // Cost of the book
+    cover_image: null, // Book cover image file
+    owner_name: "", // Name of book owner
   });
 
-  // Check if user is logged in
+  // Check if user is logged in - redirect to login if not
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (!userData) {
@@ -24,30 +28,34 @@ const BookPost = () => {
       return;
     }
 
-    // If user is logged in, get their username
+    // If user is logged in, get their username for owner_name field
     const user = JSON.parse(userData);
     setFormData((prevData) => ({
       ...prevData,
       owner_name: user.username,
     }));
 
-    // Show loading animation
+    // Show loading animation briefly
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1000);
 
+    // Clean up timer
     return () => clearTimeout(timer);
   }, [navigate]);
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, type, files, value } = e.target;
 
+    // Handle file uploads differently than text inputs
     if (type === "file" && files.length > 0) {
       setFormData({
         ...formData,
         [name]: files[0],
       });
     } else {
+      // Handle regular form inputs
       setFormData({
         ...formData,
         [name]: value,
@@ -55,12 +63,13 @@ const BookPost = () => {
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Create form data for server
+      // Create FormData object for file upload
       const bookFormData = new FormData();
       bookFormData.append("title", formData.title);
       bookFormData.append("description", formData.description);
@@ -68,22 +77,23 @@ const BookPost = () => {
       bookFormData.append("cost", formData.cost);
       bookFormData.append("owner_name", formData.owner_name);
 
-      if (formData.image && formData.image instanceof File) {
-        bookFormData.append("image", formData.image);
+      // Add image if one was selected
+      if (formData.cover_image && formData.cover_image instanceof File) {
+        bookFormData.append("cover_image", formData.cover_image);
       }
 
-      // Use axios to post with FormData
+      // Send POST request to API
       const response = await axios.post(
         "http://localhost:8000/api/books/post/",
         bookFormData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
-            // No Authorization header
+            "Content-Type": "multipart/form-data", // Required for file uploads
           },
         }
       );
 
+      // Handle successful response
       console.log("Book posted successfully:", response.data);
       setMessage({
         text: "Book posted successfully!",
@@ -97,11 +107,11 @@ const BookPost = () => {
     } catch (error) {
       console.error("Failed to post book:", error);
 
-      // More detailed error handling
+      // Detailed error handling
       let errorMessage = "Failed to post book. Please try again.";
 
       if (error.response) {
-        // The server responded with an error
+        // Server responded with an error status
         console.log("Error response data:", error.response.data);
 
         if (error.response.data && typeof error.response.data === "object") {
@@ -123,6 +133,7 @@ const BookPost = () => {
         }
       }
 
+      // Set error message
       setMessage({
         text: errorMessage,
         type: "error",
@@ -131,6 +142,7 @@ const BookPost = () => {
     }
   };
 
+  // Show loading screen while initializing
   if (loading) {
     return <LoadingScreen message="Preparing book post form..." />;
   }
@@ -141,6 +153,7 @@ const BookPost = () => {
         Post a Book for Exchange
       </h2>
 
+      {/* Success/error message */}
       {message.text && (
         <div
           className={`mb-4 p-3 rounded ${
@@ -153,7 +166,9 @@ const BookPost = () => {
         </div>
       )}
 
+      {/* Book posting form */}
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Owner name field - prefilled and readonly */}
         <div className="form-group">
           <label
             htmlFor="owner_name"
@@ -176,6 +191,7 @@ const BookPost = () => {
           </p>
         </div>
 
+        {/* Book title field */}
         <div className="form-group">
           <label
             htmlFor="title"
@@ -195,6 +211,7 @@ const BookPost = () => {
           />
         </div>
 
+        {/* Book description field */}
         <div className="form-group">
           <label
             htmlFor="description"
@@ -214,6 +231,7 @@ const BookPost = () => {
           ></textarea>
         </div>
 
+        {/* Location field */}
         <div className="form-group">
           <label
             htmlFor="location"
@@ -233,6 +251,7 @@ const BookPost = () => {
           />
         </div>
 
+        {/* Cost field */}
         <div className="form-group">
           <label
             htmlFor="cost"
@@ -257,17 +276,18 @@ const BookPost = () => {
           </p>
         </div>
 
+        {/* Book cover image upload */}
         <div className="form-group">
           <label
-            htmlFor="image"
+            htmlFor="cover_image"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
             Book Cover Image
           </label>
           <input
             type="file"
-            id="image"
-            name="image"
+            id="cover_image"
+            name="cover_image"
             onChange={handleChange}
             accept="image/*"
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -277,6 +297,7 @@ const BookPost = () => {
           </p>
         </div>
 
+        {/* Form actions */}
         <div className="flex items-center justify-between pt-4 mt-6">
           <Link
             to="/bookexchange"
