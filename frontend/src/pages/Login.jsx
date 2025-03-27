@@ -72,7 +72,7 @@ const Login = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Email:</label>
+            <label className="block text-gray-700 mb-2">Username/Email:</label>
             <input
               type="text"
               name="email"

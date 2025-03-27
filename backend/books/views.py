@@ -163,9 +163,8 @@ def booked_by_me(request):
 @api_view(['GET'])
 def posted_by_me(request):
     """
-    View function to display books posted by a specific user.
-    
-    Filters books by the owner_email provided in the query parameter.
+    View function to display books posted by the authenticated user.
+    Filters books by the owner information.
     """
     user = request.user
     
@@ -174,17 +173,29 @@ def posted_by_me(request):
             {"error": "Authentication required"},
             status=status.HTTP_401_UNAUTHORIZED
         )
-    owner_email = user.email
     
-    if not owner_email:
+    # Get user's email
+    user_email = user.email
+    
+    # Check if email exists
+    if not user_email:
         return Response(
             {"error": "User email not found"},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    
-    # Query books posted by this email
-    books = Book.objects.filter(owner_email=owner_email).order_by('-id')
+    # Query books posted by this user, newest first
+    # Use owner_email if that field exists in your model
+    if hasattr(Book, 'owner_email'):
+        books = Book.objects.filter(owner_email=user_email).order_by('-id')
+    # Otherwise use owner_name if that matches username
+    elif hasattr(Book, 'owner_name'):
+        books = Book.objects.filter(owner_name=user.username).order_by('-id')
+    else:
+        return Response(
+            {"error": "No appropriate field to filter by owner"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     
     # Serialize the books and return as JSON
     serializer = BookSerializer(books, many=True)
@@ -205,3 +216,70 @@ class BookPostView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+@api_view(['DELETE'])
+def delete_book(request, book_id):
+    # Get the book
+    book = get_object_or_404(Book, id=book_id)
+    
+    # Check if the logged in user is the owner (important security check)
+    if book.owner_name != request.user.username:
+        return Response({"error": "You don't have permission to delete this book"},
+                       status=status.HTTP_403_FORBIDDEN)
+    
+    # Delete the book
+    book.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+def book_detail(request, book_id):
+    """
+    View function to get detailed information about a specific book.
+    Returns a single book with all its details.
+    """
+    try:
+        # Get the book by ID or return 404 if not found
+        book = get_object_or_404(Book, id=book_id)
+        
+        # Serialize the book data
+        serializer = BookSerializer(book)
+        
+        # Return the serialized data
+        return Response(serializer.data)
+    except Exception as e:
+        # Return error response if any exception occurs
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['PATCH'])
+def update_book(request, book_id):
+    """
+    Update an existing book.
+    Only the owner can update their book.
+    """
+    try:
+        # Get the book
+        book = get_object_or_404(Book, id=book_id)
+        
+        # Check if the user is the owner
+        if book.owner_name != request.user.username:
+            return Response(
+                {"error": "You don't have permission to edit this book"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Update the book with the new data
+        serializer = BookSerializer(book, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

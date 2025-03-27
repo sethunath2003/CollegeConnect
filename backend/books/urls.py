@@ -25,4 +25,22 @@ urlpatterns = [
     # Include all DRF API routes
     path('', include(router.urls)),
     
+    # URL for viewing details of a specific book
+    path('book/<int:book_id>/', views.book_detail, name='book-detail'),
+    
+    # Include all DRF router URLs under the 'api/' prefix
+    path('api/', include(router.urls)),
+    
+    # Add this line to your existing URLs
+    path('books/<int:book_id>/', views.book_detail, name='book-detail'),
+    
+     # Delete endpoint
+    path('delete/<int:book_id>/', views.delete_book, name='delete-book'),
+    
+    # Update endpoint
+    path('update/<int:book_id>/', views.update_book, name='update-book'),
+    
+    # Book detail endpoint
+    path('<int:book_id>/', views.book_detail, name='book-detail'),
+    
 ]
