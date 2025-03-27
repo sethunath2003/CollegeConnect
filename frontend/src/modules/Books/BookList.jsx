@@ -187,12 +187,31 @@ const BookList = () => {
         {/* Header with title and post button */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Books Exchange</h1>
-          <Link
-            to="/bookexchange/post"
-            className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Post a Book
-          </Link>
+          <div className="flex gap-3">
+            {/* Only show my books buttons when user is logged in */}
+            {userLoggedIn && (
+              <>
+                <Link
+                  to="/bookexchange/posted"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Books I Posted
+                </Link>
+                <Link
+                  to="/bookexchange/booked"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Books I Booked
+                </Link>
+              </>
+            )}
+            <Link
+              to="/bookexchange/post"
+              className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Post a Book
+            </Link>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -266,15 +285,15 @@ const BookList = () => {
 
                 {/* Book cover image */}
                 <div className="h-48 bg-gray-200 overflow-hidden">
-                <img
-  src={getBookImageUrl(book.cover_image)}
-  alt={book.title}
-  className="w-full h-full object-cover"
-  onError={(e) => {
-    e.target.onerror = null;
-    e.target.src = defaultBookCover;
-  }}
-/>
+                  <img
+                    src={getBookImageUrl(book.cover_image)}
+                    alt={book.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = defaultBookCover;
+                    }}
+                  />
                 </div>
 
                 {/* Book details */}

@@ -90,7 +90,7 @@ const Login = () => {
         )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Email:</label>
+            <label className="block text-gray-700 mb-2">Username/Email:</label>
             <input
               type="text"
               name="email"

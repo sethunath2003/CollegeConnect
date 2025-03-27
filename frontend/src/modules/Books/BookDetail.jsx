@@ -1,208 +1,167 @@
-// Import necessary hooks from React
-import { useState, useEffect } from "react";
-// Import useParams to access URL parameters (like book ID)
-import { useParams } from "react-router-dom";
-// Import the Layout component for consistent page structure
-import Layout from "../../components/Layout";
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 const BookDetail = () => {
-  // Extract the 'id' parameter from the URL
   const { id } = useParams();
-
-  // State to store the book details once fetched
   const [book, setBook] = useState(null);
-
-  // Loading state to handle UI during API requests
-  const [loading, setLoading] = useState(false);
-
-  // Form data state for the booking form
-  const [formData, setFormData] = useState({
-    booker_name: "", // Will store the name of person booking the book
-    booker_email: "", // Will store the email of person booking the book
-  });
-
-  // State to store any error messages
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to fetch book details from the API
-  const handleGetDetails = async () => {
-    // Set loading to true to show loading indicator
-    setLoading(true);
-    // Clear any previous errors
-    setError(null);
-    try {
-      // Make a GET request to the API to fetch book details
-      const response = await fetch(`http://localhost:8000/api/books/${id}`);
-      // Check if the response is successful
-      if (!response.ok) throw new Error("Failed to fetch book details");
-      // Parse the JSON response
-      const data = await response.json();
-      // Update the book state with fetched data
-      setBook(data);
-    } catch (err) {
-      // Store error message if the request fails
-      setError(err.message);
-    }
-    // Set loading to false regardless of success or failure
-    setLoading(false);
+  // Default image for books without cover
+  const defaultBookCover = "https://placehold.co/400x600";
+
+  // Helper function to build the full image URL
+  const getBookImageUrl = (image) => {
+    if (!image) return defaultBookCover;
+    return image.startsWith("http")
+      ? image // Use as-is if already a full URL
+      : `http://localhost:8000/${image.replace(/^\//, "")}`; // Otherwise, construct URL
   };
 
-  // Handle changes in form input fields
-  const handleChange = (e) => {
-    // Destructure name and value from the event target
-    const { name, value } = e.target;
-    // Update formData state while preserving other field values
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value, // Update only the changed field
-    }));
-  };
+  useEffect(() => {
+    const fetchBookDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/books/${id}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setBook(response.data);
+      } catch (err) {
+        console.error("Failed to fetch book details:", err);
+        setError("Failed to load book details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Handle form submission to reserve a book
-  const handleSubmit = async (e) => {
-    // Prevent default form submission behavior
-    e.preventDefault();
-    // Set loading state to show processing indicator
-    setLoading(true);
-    // Clear any previous errors
-    setError(null);
-    try {
-      // Log form data for debugging
-      console.log("FormDataSent is ", formData);
-      // Send POST request to reserve the book
-      const response = await fetch(
-        `http://localhost:8000/api/books/${id}/reserve`,
-        {
-          method: "POST", // Use POST method for creating a reservation
-          headers: { "Content-Type": "application/json" }, // Set content type to JSON
-          body: JSON.stringify(formData), // Convert form data to JSON string
-        }
-      );
-      // Check if the response is successful
-      if (!response.ok) throw new Error("Reservation failed");
-      // Parse the JSON response
-      const updatedBook = await response.json();
-      // Update the book state with the updated data (now including booker info)
-      setBook(updatedBook);
-    } catch (err) {
-      // Store error message if the request fails
-      setError(err.message);
-    }
-    // Set loading to false regardless of success or failure
-    setLoading(false);
-  };
+    fetchBookDetails();
+  }, [id]);
 
-  // Render the component UI
-  return (
-    // Use the Layout component for consistent page structure
-    <Layout title="Book Detail">
-      <div className="container mx-auto px-4 py-8">
-        {/* Conditional rendering based on whether book data is loaded */}
-        {!book ? (
-          // Show this if book data hasn't been loaded yet
-          <div className="text-center">
-            {/* Display error message if there is one */}
-            {error && <p className="text-red-500">{error}</p>}
-            {/* Button to fetch book details */}
-            <button
-              onClick={handleGetDetails}
-              className="bg-blue-500 text-white p-2 rounded-md"
-              disabled={loading} // Disable button while loading
-            >
-              {/* Change button text based on loading state */}
-              {loading ? "Loading..." : "Get Details"}
-            </button>
+  if (loading) {
+    return <LoadingScreen message="Loading book details..." />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex-grow p-8 bg-gray-100">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
           </div>
-        ) : (
-          // Show this if book data is loaded
-          <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-            {/* Display book title */}
-            <h1 className="text-2xl font-bold mb-2">{book.title}</h1>
-            {/* Display book description */}
-            <p className="text-gray-700 mb-4">{book.description}</p>
-            {/* Display book metadata */}
-            <div className="mb-4">
-              <p className="text-gray-600">
-                <strong>Location:</strong> {book.location}
-              </p>
-              <p className="text-gray-600">
-                <strong>Cost:</strong> ${book.cost}
-              </p>
-              <p className="text-gray-600">
-                <strong>Owner:</strong> {book.owner_name}
-              </p>
-            </div>
-
-            {/* Conditional rendering based on whether book is already booked */}
-            {book.booker_name ? (
-              // Show this if book is already booked
-              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                <h3 className="text-lg font-semibold text-yellow-700">
-                  Booked by: {book.booker_name}
-                </h3>
-                <p className="text-yellow-600">
-                  Contact Email: {book.booker_email}
-                </p>
-              </div>
-            ) : (
-              // Show booking form if book isn't booked yet
-              <form onSubmit={handleSubmit} className="mt-6 border-t pt-4">
-                <h3 className="text-lg font-semibold mb-4">
-                  Reserve this book:
-                </h3>
-                {/* Name input field */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="booker_name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="booker_name"
-                    name="booker_name"
-                    value={formData.booker_name}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                    required
-                  />
-                </div>
-                {/* Email input field */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="booker_email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Your Email
-                  </label>
-                  <input
-                    type="email"
-                    id="booker_email"
-                    name="booker_email"
-                    value={formData.booker_email}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                    required
-                  />
-                </div>
-                {/* Submit button */}
-                <button
-                  type="submit"
-                  className="w-full bg-blue-500 text-white p-2 rounded-md"
-                  disabled={loading} // Disable while loading
-                >
-                  {/* Change button text based on loading state */}
-                  {loading ? "Reserving..." : "Reserve Book"}
-                </button>
-              </form>
-            )}
-          </div>
-        )}
+          <Link
+            to="/bookexchange"
+            className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Back to Books
+          </Link>
+        </div>
       </div>
-    </Layout>
+    );
+  }
+
+  if (!book) {
+    return (
+      <div className="flex-grow p-8 bg-gray-100">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6 text-center">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+            Book not found
+          </h2>
+          <Link
+            to="/bookexchange"
+            className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Back to Books
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-grow p-8 bg-gray-100">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6 flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-800">Book Details</h1>
+          <Link
+            to="/bookexchange"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Back to Books
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="md:flex">
+            <div className="md:w-1/3 p-4">
+              <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-lg">
+                <img
+                  src={getBookImageUrl(book.cover_image)}
+                  alt={book.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = defaultBookCover;
+                  }}
+                />
+              </div>
+            </div>
+            <div className="md:w-2/3 p-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                {book.title}
+              </h2>
+              <p className="text-xl font-bold text-green-600 mb-4">
+                ${book.cost}
+              </p>
+
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-700">
+                  Description:
+                </h3>
+                <p className="text-gray-600">{book.description}</p>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-700">
+                  Details:
+                </h3>
+                <ul className="list-disc list-inside text-gray-600">
+                  <li>Posted by: {book.owner_name || "Anonymous"}</li>
+                  <li>Location: {book.location}</li>
+                  {book.booker_name && (
+                    <li className="text-red-600 font-semibold">
+                      This book has been booked by {book.booker_name}
+                    </li>
+                  )}
+                </ul>
+              </div>
+
+              {book.booker_name && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <h3 className="text-lg font-semibold text-yellow-700 mb-2">
+                    Booking Information
+                  </h3>
+                  <p className="text-gray-600">
+                    <span className="font-semibold">Booked by:</span>{" "}
+                    {book.booker_name}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-semibold">Contact:</span>{" "}
+                    {book.booker_email}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-// Export the component for use in other parts of the application
 export default BookDetail;

@@ -1,43 +1,66 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 
 const BookedByMe = () => {
+  const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userEmail, setUserEmail] = useState("");
+  const [userData, setUserData] = useState(null);
 
-  // Placeholder image as base64 or URL
+  // Default image for books without cover
   const defaultBookCover = "https://placehold.co/400x600";
 
-  // Handle email input change
-  const handleEmailChange = (e) => {
-    setUserEmail(e.target.value);
+  // Helper function to build the full image URL
+  const getBookImageUrl = (image) => {
+    if (!image) return defaultBookCover;
+    return image.startsWith("http")
+      ? image // Use as-is if already a full URL
+      : `http://localhost:8000/${image.replace(/^\//, "")}`; // Otherwise, construct URL
   };
 
-  // Submit search by email
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  // Fetch books booked by the current user when component mounts
+  useEffect(() => {
+    const fetchBookedBooks = async () => {
+      // Get user data from localStorage
+      const storedUserData = localStorage.getItem("user");
+      if (!storedUserData) {
+        // If not logged in, redirect to login page
+        navigate("/login");
+        return;
+      }
 
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/api/booked-by-me/?email=${encodeURIComponent(
-          userEmail
-        )}`
-      );
-      setBooks(response.data.results);
-    } catch (err) {
-      console.error("Failed to fetch booked books:", err);
-      setError("Failed to load your booked books. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const userData = JSON.parse(storedUserData);
+        setUserData(userData);
 
-  if (loading && books.length === 0) {
+        // Fetch books booked by the current user using the correct endpoint
+        const response = await axios.get(
+          "http://localhost:8000/api/books/booked_by_me/",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        // Check if the response has the expected structure
+        const booksData = response.data.results || response.data;
+        setBooks(Array.isArray(booksData) ? booksData : []);
+      } catch (err) {
+        console.error("Failed to fetch booked books:", err);
+        setError("Failed to load your booked books. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookedBooks();
+  }, [navigate]);
+
+  if (loading) {
     return <LoadingScreen message="Loading your booked books..." />;
   }
 
@@ -56,15 +79,6 @@ const BookedByMe = () => {
           </Link>
         </div>
 
-        {/* Email Search Form */}
-        
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Find My Bookings
-            </button>
-
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
@@ -82,7 +96,7 @@ const BookedByMe = () => {
                 <div className="relative">
                   <div className="h-48 bg-gray-200 overflow-hidden">
                     <img
-                      src={book.image || defaultBookCover}
+                      src={getBookImageUrl(book.cover_image)}
                       alt={book.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -109,7 +123,7 @@ const BookedByMe = () => {
                     Location: {book.location}
                   </p>
                   <Link
-                    to={`/books/${book.id}`}
+                    to={`/bookexchange/book/${book.id}`}
                     className="block text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                   >
                     View Details
@@ -121,23 +135,17 @@ const BookedByMe = () => {
         ) : (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-              {userEmail
-                ? "No books found"
-                : "Enter your email to see your booked books"}
+              You haven't booked any books yet
             </h2>
             <p className="text-gray-600 mb-6">
-              {userEmail
-                ? "You haven't booked any books yet."
-                : "Please enter the email you used when booking books."}
+              Browse the books exchange to find books you're interested in.
             </p>
-            {userEmail && (
-              <Link
-                to="/bookexchange"
-                className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Browse Available Books
-              </Link>
-            )}
+            <Link
+              to="/bookexchange"
+              className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Browse Available Books
+            </Link>
           </div>
         )}
       </div>
