@@ -32,11 +32,10 @@ const Homepage = () => {
 
   return (
     <main className="py-6 px-4 mb-4">
-      {" "}
-      {/* Reduced bottom margin */}
       {/* Welcome message with user's name */}
       <div className="mb-6">
-        <h1 className="text-2xl text-center font-bold text-white">Welcome, {username}!
+        <h1 className="text-2xl text-center font-bold text-white">
+          Welcome, {username}!
           <p className="text-gray-300">What would you like to do today?</p>
         </h1>
       </div>
@@ -45,17 +44,13 @@ const Homepage = () => {
         {/* Letter Drafting Card */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
           <div className="h-48 bg-blue-100 flex items-center justify-center">
-            {" "}
-            {/* Increased height */}
             <img
               src="/LetterDrafting.jpg"
               alt="Letter Drafting"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain" /* Changed from object-cover to object-contain */
             />
           </div>
           <div className="p-8">
-            {" "}
-            {/* Increased padding */}
             <h2 className="text-2xl font-bold mb-4">Letter Drafting</h2>
             <p className="mb-6 text-gray-600">
               Create professional letters for internships, leave applications,
@@ -76,12 +71,10 @@ const Homepage = () => {
               <img
                 src="/Book exchange.jpg"
                 alt="Study Material Exchange"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain" /* Changed from object-cover to object-contain */
               />
             </div>
             <div className="p-8">
-              {" "}
-              {/* Increased padding */}
               <h2 className="text-2xl font-bold mb-4">
                 Study Material Exchange
               </h2>
@@ -109,12 +102,10 @@ const Homepage = () => {
               <img
                 src="/Hackathon.jpg"
                 alt="Events and Hackathons"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill" /* Changed from object-cover to object-contain */
               />
             </div>
             <div className="p-8">
-              {" "}
-              {/* Increased padding */}
               <h2 className="text-2xl font-bold mb-4">Events and Hackathons</h2>
               <p className="mb-6 text-gray-600">
                 Stay updated on upcoming events and hackathons.

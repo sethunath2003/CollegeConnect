@@ -42,16 +42,19 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "letters",
+    "books",
     'rest_framework',
     'rest_framework_simplejwt',
+    'events',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # Comment out this line to disable CSRF protection globally
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -86,9 +89,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mini_project',  # Replace with your database name
         'USER': 'root',  # Or your MySQL user
-        'PASSWORD': 'Root@1234',  # Or your MySQL password
+        'PASSWORD': 'Root12345',  # Or your MySQL password
         'HOST': 'localhost',  # Or your MySQL host
         'PORT': '3306',  # Or your MySQL port (usually 3306)
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # **VERY IMPORTANT: Ensure this line is present and spelled correctly**
+        },
     }
 }
 
@@ -134,16 +140,22 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_CREDENTIALS = True # For development only
 # Or keep your specific origins:
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:5173",  # Add Vite's default port
+    "http://localhost:5173",  # Vite default port
+    "http://127.0.0.1:5173",
 ]
+
+# Set default authentication and permission policies
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Set default to allow any
+    ],
 }
 
 SIMPLE_JWT = {
@@ -161,3 +173,6 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
+
+# Add this to your settings.py
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']
