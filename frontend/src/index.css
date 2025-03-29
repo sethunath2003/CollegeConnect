@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap");
 
 /* CSS Variables */
 :root {
@@ -8,6 +9,18 @@
   --primary: #3b82f6;
   --trans-dur: 0.3s;
   --pl-dur: 2.6s;
+  --font-heading: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
 }
 
 /* Base Styles */
@@ -52,6 +65,9 @@ button {
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   cursor: pointer;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .nav-buttons button {
@@ -94,9 +110,11 @@ button {
 }
 
 .welcome-heading {
-  font-size: 1.875rem;
+  font-size: 2.25rem;
   font-weight: 700;
+  letter-spacing: -0.025em;
   color: white;
+  margin-bottom: 0.5rem;
 }
 
 .welcome-subheading {
@@ -123,6 +141,13 @@ button {
   }
 }
 
+/* Services page card titles */
+.services-grid h2.text-xl {
+  font-weight: 700;
+  margin-bottom: 0.875rem;
+  letter-spacing: -0.01em;
+}
+
 /* Card Styles */
 .card {
   background-color: white;
@@ -133,10 +158,12 @@ button {
   text-align: center;
 }
 
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
+.card-title,
+.letter-card h3,
+.text-lg.font-semibold {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .card-description {
@@ -264,11 +291,26 @@ img {
   margin-bottom: 0.5rem;
 }
 
+label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.375rem;
+  display: block;
+}
+
 .form-input {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.25rem;
+}
+
+input,
+textarea,
+select {
+  line-height: var(--line-height-normal);
+  padding: 0.625rem 0.75rem;
 }
 
 .form-input:focus {
@@ -353,6 +395,12 @@ img {
   gap: 1.5rem;
 }
 
+.letter-options-grid .letter-card h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+}
+
 .letter-grid-header {
   font-size: 1.25rem;
   font-weight: 600;
@@ -424,8 +472,9 @@ img {
 }
 
 .modal-title {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   margin-bottom: 1rem;
   color: #1a202c;
   text-align: center;
@@ -434,9 +483,10 @@ img {
 }
 
 .modal-description {
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
+  font-family: var(--font-body);
+  line-height: var(--line-height-relaxed);
   color: #4a5568;
+  margin-bottom: 1.5rem;
 }
 
 .modal-actions {
@@ -623,4 +673,311 @@ img {
   to {
     z-index: 1;
   }
+}
+
+/* Apply font families */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.text-3xl,
+.text-2xl,
+.text-xl,
+.font-bold {
+  font-family: var(--font-heading);
+}
+
+h1,
+.text-3xl {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.025em;
+  margin-bottom: 1.5rem;
+}
+
+h2,
+.text-2xl {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.015em;
+  margin-bottom: 1.25rem;
+}
+
+h3,
+.text-xl {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: var(--line-height-tight);
+  margin-bottom: 1rem;
+}
+
+p,
+.text-base {
+  font-size: var(--text-base);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: 1rem;
+}
+
+body,
+p,
+div,
+button,
+input,
+textarea,
+select,
+.text-base,
+.text-lg,
+.text-sm {
+  font-family: var(--font-body);
+}
+
+/* UI Refinement - Add this to the end of your index.css file */
+
+/* Enhanced whitespace and consistency */
+:root {
+  /* Grid system refinements */
+  --grid-gap-sm: 1rem;
+  --grid-gap-md: 1.5rem;
+  --grid-gap-lg: 2rem;
+  --grid-gap-xl: 3rem;
+
+  /* Spacing system */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 2.5rem;
+  --space-3xl: 3rem;
+
+  /* Improved shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 14px 20px -4px rgba(0, 0, 0, 0.15),
+    0 6px 8px -2px rgba(0, 0, 0, 0.1);
+
+  /* Refined border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+}
+
+/* Improved card whitespace and styling */
+.bg-white.rounded-lg.shadow-md,
+.card,
+.letter-card {
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.bg-white.rounded-lg.shadow-md:hover,
+.card:hover,
+.letter-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Enhanced grid layouts with consistent gaps */
+.grid {
+  gap: var(--grid-gap-md);
+}
+
+.grid.gap-6 {
+  gap: var(--grid-gap-lg);
+}
+
+.grid.gap-8 {
+  gap: var(--grid-gap-xl);
+}
+
+/* Improved images within cards */
+.card img,
+.bg-white.rounded-lg.shadow-md img {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  transition: transform 0.3s ease;
+}
+
+.card:hover img,
+.bg-white.rounded-lg.shadow-md:hover img {
+  transform: scale(1.025);
+}
+
+/* Enhanced typography spacing */
+p,
+.text-gray-600 {
+  margin-bottom: var(--space-lg);
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: var(--space-md);
+}
+
+h1,
+.text-3xl {
+  margin-bottom: var(--space-xl);
+}
+
+/* Improved button spacing and interaction */
+button,
+.bg-blue-500,
+.bg-green-500,
+.bg-purple-500,
+.bg-red-600 {
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Enhanced header styling */
+header.bg-gray-900 {
+  padding: 1rem var(--space-lg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* More breathing room between nav items */
+header .flex.mx-auto.space-x-4 {
+  gap: var(--space-lg);
+}
+
+/* Enhanced list styling */
+ul.list-disc {
+  margin-left: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+ul.list-disc li {
+  margin-bottom: var(--space-xs);
+  padding-left: var(--space-xs);
+}
+
+/* Better modal styling */
+.modal-content,
+.bg-white.rounded-lg.p-8 {
+  padding: var(--space-2xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Improved form control spacing */
+input,
+textarea,
+select {
+  padding: 0.75rem 1rem;
+  margin-bottom: var(--space-md);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* Service cards with better spacing */
+.services-grid .bg-white.rounded-lg.shadow-md {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.services-grid .p-6 {
+  padding: var(--space-xl);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.services-grid button {
+  margin-top: auto;
+}
+
+/* Better padding in card contents */
+.bg-white.rounded-lg.shadow-md .p-4,
+.bg-white.rounded-lg.shadow-md .p-6 {
+  padding: var(--space-xl);
+}
+
+/* Improved user avatar */
+.w-10.h-10.rounded-full {
+  width: 2.75rem;
+  height: 2.75rem;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Add this to improve header styling */
+header.bg-gray-900 {
+  margin-top: var(--space-md);
+}
+
+/* Add this to improve grid layouts */
+
+/* Consistent 3-column grid on large screens */
+@media (min-width: 1024px) {
+  .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Fix for 2-column grid on medium screens */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .grid.grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Better homepage layout with more whitespace */
+.max-w-6xl.mx-auto.p-8 {
+  padding: var(--space-3xl) var(--space-lg);
+  max-width: 72rem;
+}
+
+/* Card content vertical spacing */
+.bg-white.rounded-lg h2,
+.bg-white.rounded-lg h3 {
+  margin-bottom: var(--space-md);
+}
+
+.bg-white.rounded-lg p {
+  margin-bottom: var(--space-lg);
+}
+
+/* Better card layout with flexbox for equal heights */
+.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 > div > div.p-6,
+.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 > div > div.p-4 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 > div button.w-full {
+  margin-top: auto;
 }

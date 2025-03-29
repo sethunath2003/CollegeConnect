@@ -1,11 +1,13 @@
 import requests
 import json
 import time
-import schedule
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from .models import Event
+from django.db import IntegrityError
 
 def scrape_events():
+    """Scrape events from reskilll.com and save to database"""
     url = "https://reskilll.com/allhacks"
     headers = {"User-Agent": "Mozilla/5.0"}
 
@@ -25,43 +27,54 @@ def scrape_events():
         return []
 
     events = []
+    created_count = 0
     for card in event_list:
-        # ✅ Fix: Use lambda for flexible class matching
         title_tag = card.find("a", class_="allhackname eventName text-decoration-none")
         title = title_tag.text.strip() if title_tag else "No title found"
 
-        # ✅ Debugging: Print title to check if it's extracted correctly
-        print(f"Extracted title: {title}")
-
         image_tag = card.find("img", class_="allhacksbanner")
-        image_url = urljoin(url, image_tag["src"]) if image_tag and "src" in image_tag.attrs else "No image"
+        image_url = urljoin(url, image_tag["src"]) if image_tag and "src" in image_tag.attrs else None
 
         description_tag = card.find("div", class_="eventDescription")
-        description = description_tag.text.strip() if description_tag else "No description"
+        description = description_tag.text.strip() if description_tag else None
 
         registration_dates = card.find_all("div", class_="hackresgiterdate")
-        registration_start = registration_dates[0].text.strip() if len(registration_dates) > 0 else "No start date"
-        registration_end = registration_dates[1].text.strip() if len(registration_dates) > 1 else "No end date"
+        registration_start = registration_dates[0].text.strip() if len(registration_dates) > 0 else None
+        registration_end = registration_dates[1].text.strip() if len(registration_dates) > 1 else None
 
-        link_tag = title_tag["href"] if title_tag and "href" in title_tag.attrs else "No link"
+        event_url = title_tag["href"] if title_tag and "href" in title_tag.attrs else None
+        
+        # Create or update event in database
+        try:
+            event, created = Event.objects.update_or_create(
+                title=title,
+                defaults={
+                    'description': description,
+                    'image_url': image_url,
+                    'link': event_url or url,
+                    'event_url': event_url,
+                    'registration_start': registration_start,
+                    'registration_end': registration_end,
+                }
+            )
+            if created:
+                created_count += 1
+                
+            # Add to response list
+            events.append({
+                "id": event.id,
+                "title": title,
+                "image_url": image_url,
+                "description": description,
+                "registration_start": registration_start,
+                "registration_end": registration_end,
+                "link": event_url
+            })
+        except IntegrityError as e:
+            print(f"❌ Could not save event {title}: {e}")
 
-        events.append({
-            "title": title,
-            "image": image_url,
-            "description": description,
-            "registration_start": registration_start,
-            "registration_end": registration_end,
-            "event_url": link_tag
-        })
-
-    save_to_json(events)
-    print(f"✅ Found {len(events)} events and saved to events.json.")
+    print(f"✅ Found {len(events)} events. Created {created_count} new events.")
     return events
-
-def save_to_json(events, filename="events.json"):
-    """Save event data to a JSON file"""
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(events, f, indent=4, ensure_ascii=False)
 
 # Run Scraper
 if __name__ == "__main__":

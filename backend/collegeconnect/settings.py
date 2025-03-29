@@ -92,6 +92,9 @@ DATABASES = {
         'PASSWORD': 'Root12345',  # Or your MySQL password
         'HOST': 'localhost',  # Or your MySQL host
         'PORT': '3306',  # Or your MySQL port (usually 3306)
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # **VERY IMPORTANT: Ensure this line is present and spelled correctly**
+        },
     }
 }
 
