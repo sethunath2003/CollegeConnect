@@ -9,21 +9,21 @@ from django.db import IntegrityError
 def scrape_events():
     """Scrape events from reskilll.com and save to database"""
     url = "https://reskilll.com/allhacks"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0"
+    }
 
     try:
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
-        print(f"✅ Successfully fetched page: {response.status_code}")
     except requests.RequestException as e:
-        print(f"❌ Failed to fetch page: {e}")
         return []
 
     soup = BeautifulSoup(response.text, "html.parser")
     event_list = soup.find_all("div", class_="hackathonCard")
 
     if not event_list:
-        print("❌ No event list found. Check if the class has changed.")
+        print("No events found on the page.")
         return []
 
     events = []
@@ -33,7 +33,9 @@ def scrape_events():
         title = title_tag.text.strip() if title_tag else "No title found"
 
         image_tag = card.find("img", class_="allhacksbanner")
+
         image_url = urljoin(url, image_tag["src"]) if image_tag and "src" in image_tag.attrs else None
+        print(f"Scraped image_url: {image_url}, Length: {len(image_url)}")
 
         description_tag = card.find("div", class_="eventDescription")
         description = description_tag.text.strip() if description_tag else None
