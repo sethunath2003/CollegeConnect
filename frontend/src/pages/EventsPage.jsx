@@ -7,6 +7,7 @@ const EventsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [scraping, setScraping] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(""); // Add this state for success messages
 
   const fetchEvents = async (useScraper = false) => {
     try {
@@ -14,6 +15,9 @@ const EventsPage = () => {
       if (useScraper) {
         setScraping(true);
       }
+
+      // Clear any previous success messages
+      setSuccessMessage("");
 
       // Use the scraper endpoint if requested, otherwise use the regular events endpoint
       const endpoint = useScraper
@@ -23,12 +27,33 @@ const EventsPage = () => {
       const response = await axios.get(endpoint);
 
       // Handle different response formats from the two endpoints
+      let eventsData;
       if (useScraper && response.data.events) {
-        setEvents(response.data.events);
+        eventsData = response.data.events;
+
+        // Set success message with new event count
+        const newEventCount = response.data.new_event_count || 0;
+        const totalEventCount =
+          response.data.total_event_count || eventsData.length;
+        setSuccessMessage(
+          `Successfully scraped ${totalEventCount} events. Found ${newEventCount} new events!`
+        );
       } else {
-        setEvents(response.data.results || response.data);
+        eventsData = response.data.results || response.data;
       }
 
+      // Filter events to only include those with registration_end dates in or after 2024
+      const filteredEvents = eventsData.filter((event) => {
+        if (!event.registration_end) return true; // Keep events with no end date
+
+        // Parse the registration_end date
+        const endDate = new Date(event.registration_end);
+
+        // Check if it's a valid date and year is >= 2024
+        return !isNaN(endDate.getTime()) && endDate.getFullYear() >= 2024;
+      });
+
+      setEvents(filteredEvents);
       setLoading(false);
       setScraping(false);
     } catch (err) {
@@ -47,18 +72,6 @@ const EventsPage = () => {
     // Load events when the component mounts
     fetchEvents(false);
   }, []);
-
-  if (loading) {
-    return (
-      <LoadingScreen
-        message={
-          scraping
-            ? "Scraping latest events and hackathons..."
-            : "Loading events and hackathons..."
-        }
-      />
-    );
-  }
 
   return (
     <div className="flex-grow p-8 bg-gray-100">
@@ -81,6 +94,13 @@ const EventsPage = () => {
           </button>
         </div>
 
+        {/* Display success message */}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+            {successMessage}
+          </div>
+        )}
+
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
             {error}
@@ -93,8 +113,17 @@ const EventsPage = () => {
             {events.map((event, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
+                className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all ${
+                  event.newly_created ? "ring-2 ring-green-500" : ""
+                }`}
               >
+                {/* Add a "New" badge for newly created events */}
+                {event.newly_created && (
+                  <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold uppercase px-2 py-1 rounded">
+                    New
+                  </div>
+                )}
+
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img
                     src={event.image || event.image_url || "/Hackathon.jpg"}

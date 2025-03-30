@@ -981,3 +981,16 @@ header.bg-gray-900 {
 .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 > div button.w-full {
   margin-top: auto;
 }
+
+/* Background with Saintgits image for landing page */
+.saintgits-bg {
+  background-image: linear-gradient(
+      rgba(17, 24, 39, 0.75),
+      rgba(17, 24, 39, 0.85)
+    ),
+    url("/Saintgits.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}

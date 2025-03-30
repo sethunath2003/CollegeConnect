@@ -42,8 +42,8 @@ const Homepage = () => {
         </h1>
       </div>
 
-      {/* Changed to column layout with centered cards */}
-      <div className="flex flex-col items-center max-w-3xl mx-auto gap-8">
+      {/* Changed to column layout with full-width cards */}
+      <div className="flex flex-col items-center w-full gap-8">
         {/* Letter Drafting Card */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden w-full hover:shadow-lg transition-all duration-300">
           {/* Image at top */}

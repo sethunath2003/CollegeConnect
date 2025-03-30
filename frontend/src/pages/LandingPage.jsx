@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles.css";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -48,8 +47,8 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
-      <main className="flex-grow max-w-7xl mx-auto p-6 md:p-12 bg-gray-900">
+    <div className="min-h-screen saintgits-bg flex flex-col">
+      <main className="flex-grow max-w-7xl mx-auto p-6 md:p-12">
         <div className="text-center mb-8">
           <h3 className="text-3xl font-bold text-white">
             Welcome to CollegeConnect
