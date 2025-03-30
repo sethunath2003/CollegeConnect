@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 
 const BookDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,6 +20,39 @@ const BookDetail = () => {
     return image.startsWith("http")
       ? image // Use as-is if already a full URL
       : `http://localhost:8000/${image.replace(/^\//, "")}`; // Otherwise, construct URL
+  };
+
+  // Determine where to go back to
+  const getPreviousPath = () => {
+    // Check if we have state from navigation indicating where the user came from
+    if (location.state && location.state.from) {
+      return location.state.from;
+    }
+
+    // If we don't have navigation state, try to determine from the book data
+    if (book) {
+      // If the current user is the booker, they likely came from "Books I Booked"
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        if (book.booker_name === user.username) {
+          return "/bookexchange/booked";
+        }
+        // If the current user is the owner, they likely came from "Books I Posted"
+        if (book.owner_name === user.username) {
+          return "/bookexchange/posted";
+        }
+      }
+    }
+
+    // Default fallback
+    return "/bookexchange";
+  };
+
+  // Handler for the back button
+  const handleGoBack = () => {
+    // Navigate to the appropriate previous page
+    navigate(getPreviousPath());
   };
 
   useEffect(() => {
@@ -54,12 +89,12 @@ const BookDetail = () => {
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
-          <Link
-            to="/bookexchange"
+          <button
+            onClick={handleGoBack}
             className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Back to Books
-          </Link>
+          </button>
         </div>
       </div>
     );
@@ -72,12 +107,12 @@ const BookDetail = () => {
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
             Book not found
           </h2>
-          <Link
-            to="/bookexchange"
+          <button
+            onClick={handleGoBack}
             className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Back to Books
-          </Link>
+          </button>
         </div>
       </div>
     );
@@ -88,12 +123,12 @@ const BookDetail = () => {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-800">Book Details</h1>
-          <Link
-            to="/bookexchange"
+          <button
+            onClick={handleGoBack}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Back to Books
-          </Link>
+          </button>
         </div>
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">

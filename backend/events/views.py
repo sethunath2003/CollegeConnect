@@ -39,9 +39,14 @@ def run_scraper(request):
     # Run the scraper and save to database
     events = scrape_events()
     
-    # Return the scraped events
+    # Count how many events have newly created=True
+    new_event_count = sum(1 for event in events if event.get('newly_created', False))
+    
+    # Return the scraped events with count info
     return JsonResponse({
         "status": 200,
-        "message": f"Successfully scraped {len(events)} events",
-        "events": events
+        "message": f"Successfully scraped {len(events)} events. Found {new_event_count} new events!",
+        "events": events,
+        "new_event_count": new_event_count,
+        "total_event_count": len(events)
     })

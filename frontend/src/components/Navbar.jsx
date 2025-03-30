@@ -1,4 +1,3 @@
-//TODO:ADD SIMILAR FUCTIONS AD VIEWS FOR SERVICES AND ABOUT BUTTONS
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -8,6 +7,7 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [showContactModal, setShowContactModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // State for mobile menu (ADDED)
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -15,7 +15,7 @@ const Navbar = () => {
   });
   const [submitStatus, setSubmitStatus] = useState(null);
 
-  // Function to check auth status
+  // Function to check auth status (rest remains same)
   const authStatus = () => {
     const userData = localStorage.getItem("user");
     if (userData) {
@@ -28,24 +28,20 @@ const Navbar = () => {
     }
   };
 
-  // Check if user is logged in on component mount
+  // Check if user is logged in on component mount (rest remains same)
   useEffect(() => {
     authStatus();
 
-    // Listen for storage events (when localStorage changes in other tabs/components)
     const handleStorageChange = (e) => {
       if (e.key === "user" || e.key === null) {
         authStatus();
       }
     };
 
-    // Add storage event listener
     window.addEventListener("storage", handleStorageChange);
 
-    // Check auth status every 2 seconds (as a fallback)
     const interval = setInterval(authStatus, 2000);
 
-    // Clean up
     return () => {
       window.removeEventListener("storage", handleStorageChange);
       clearInterval(interval);
@@ -54,14 +50,16 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("token"); // Also remove token
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
     setUsername("");
+    setMobileMenuOpen(false); // Close mobile menu on logout (ADDED)
     navigate("/");
   };
 
   const handleContactClick = () => {
     setShowContactModal(true);
+    setMobileMenuOpen(false); // Close mobile menu when contact modal opens (ADDED)
   };
 
   const handleContactClose = () => {
@@ -84,7 +82,7 @@ const Navbar = () => {
       const response = await axios.post(
         "http://localhost:8000/api/contact/",
         contactForm
-      ); // Fixed typo: conatctForm -> contactForm
+      );
       console.log(response.data);
       if (response.status === 201) {
         setSubmitStatus("success");
@@ -102,76 +100,176 @@ const Navbar = () => {
     }
   };
 
+  // Toggle mobile menu (rest remains same)
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <>
-      <header className="bg-gray-900 text-white p-4 flex items-center w-full relative">
-        <div className="absolute left-4">
+      {/* Main header - adjusted for all breakpoints */}
+      <div className="bg-gray-900 text-white p-3 md:p-4 flex items-center justify-between w-full relative">
+        {/* Logo - Adjusted for better mobile display */}
+        <div className="flex-none pl-2 md:pl-4">
           <Link to="/">
-            <h2 className="text-3xl font-bold">CollegeConnect</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">CollegeConnect</h2>
           </Link>
         </div>
 
-        <div className="flex mx-auto space-x-4">
+        {/* Hamburger Icon - Visible on small/medium screens, hidden on large */}
+        <div className="lg:hidden flex items-center justify-center"> {/* lg:hidden - Hides on large screens */}
+          <button
+            onClick={toggleMobileMenu}
+            className="p-2 focus:outline-none focus:bg-gray-700 rounded-md"
+            aria-label="Toggle navigation menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {mobileMenuOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
+        </div>
+
+        {/* Desktop/Large Navigation - Hidden on small/medium screens, visible on large */}
+        <div className="hidden lg:flex mx-auto space-x-6"> {/* hidden lg:flex - Visible on large screens only */}
           <Link to="/">
-            <button className="px-4 py-2 hover:bg-gray-800 rounded-md">
+            <button className="px-4 py-2 hover:bg-gray-800 rounded-md transition-colors">
               Home
             </button>
           </Link>
-          <button className="px-4 py-2 hover:bg-gray-800 rounded-md">
+          <button className="px-4 py-2 hover:bg-gray-800 rounded-md transition-colors">
             About
           </button>
-          <button className="px-4 py-2 hover:bg-gray-800 rounded-md">
+          <button className="px-4 py-2 hover:bg-gray-800 rounded-md transition-colors">
             Services
           </button>
           <button
-            className="px-4 py-2 hover:bg-gray-800 rounded-md"
+            className="px-4 py-2 hover:bg-gray-800 rounded-md transition-colors"
             onClick={handleContactClick}
           >
             Contact
           </button>
         </div>
 
-        {isLoggedIn ? (
-          <div className="absolute right-4 flex items-center">
-            <div className="mr-3">
-              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-600">
+        {/* Auth Controls - Adjusted for all breakpoints */}
+        <div className="flex-none pr-2 md:pr-4">
+          {isLoggedIn ? (
+            <div className="flex items-center">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-600">
                 {username.charAt(0).toUpperCase()}
               </div>
+              <span className="hidden lg:inline text-white ml-2 mr-4"> {/* hidden lg:inline - Hidden on large screens */}
+                {username}
+              </span>
+              {/* hidden lg:block - Visible on large screens */}
+              <button
+                onClick={handleLogout}
+                className="hidden lg:block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 ml-2"
+              >
+                Logout
+              </button>
             </div>
-            <span className="text-white mr-4">{username}</span>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <div className="absolute right-4 flex">
-            <Link to="/login">
-              <button className="px-5 py-2 bg-gray-700 text-white rounded mr-4 hover:bg-gray-600">
-                Login
-              </button>
-            </Link>
-            <Link to="/signup">
-              <button className="px-5 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">
-                Sign Up
-              </button>
-            </Link>
-          </div>
-        )}
-      </header>
+          ) : (
+            <div className="flex">
+              <Link to="/login">
+                <button className="px-3 py-1 md:px-4 md:py-2 bg-gray-700 text-white rounded text-sm md:text-base hover:bg-gray-600 transition-colors">
+                  Login
+                </button>
+              </Link>
+              <Link to="/signup" className="hidden lg:block ml-2"> {/* hidden lg:block - Visible on large screens */}
+                <button className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors">
+                  Sign Up
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
 
+      {/* Mobile Menu Dropdown - Now handles both small and medium screens */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-gray-800 text-white py-2 px-4 shadow-lg"> {/* lg:hidden - Hidden on large screens */}
+          <div className="flex flex-col space-y-2">
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-4 hover:bg-gray-700 rounded transition-colors block" // block - Full width for mobile
+            >
+              Home
+            </Link>
+            <button className="py-2 px-4 text-left hover:bg-gray-700 rounded transition-colors block"> {/* block - Full width for mobile */}
+              About
+            </button>
+            <button className="py-2 px-4 text-left hover:bg-gray-700 rounded transition-colors block"> {/* block - Full width for mobile */}
+              Services
+            </button>
+            <button
+              className="py-2 px-4 text-left hover:bg-gray-700 rounded transition-colors block" // block - Full width for mobile
+              onClick={handleContactClick}
+            >
+              Contact
+            </button>
+
+            {/* Mobile Auth Options */}
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="py-2 px-4 text-left bg-red-600 text-white rounded hover:bg-red-700 mt-4 transition-colors block" // block - Full width for mobile
+              >
+                Logout ({username})
+              </button>
+            ) : (
+              <div className="flex flex-col space-y-2 mt-2">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-2 px-4 bg-gray-700 text-white rounded text-center hover:bg-gray-600 transition-colors block" // block - Full width for mobile
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-2 px-4 bg-gray-700 text-white rounded text-center hover:bg-gray-600 transition-colors block" // block - Full width for mobile
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Contact Modal remains unchanged */}
       {showContactModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50"
           onClick={handleContactClose}
         >
           <div
-            className="bg-white rounded-lg p-8 w-11/12 max-w-lg shadow-2xl"
+            className="bg-white rounded-lg p-6 md:p-8 w-11/12 max-w-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-2xl font-bold mb-4 text-gray-800">
+            <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">
               Contact Us
             </h3>
 
@@ -232,13 +330,13 @@ const Navbar = () => {
                 <button
                   type="button"
                   onClick={handleContactClose}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                  className="px-3 py-2 md:px-4 md:py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
                 >
                   Close
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  className="px-3 py-2 md:px-4 md:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                 >
                   Send Message
                 </button>
