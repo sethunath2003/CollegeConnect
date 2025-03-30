@@ -3,6 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 
+// Add this function to get the authentication token
+const getAuthToken = () => {
+  // Get token directly from localStorage
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  return token;
+};
+
 const LetterDraft = () => {
   const { draftId } = useParams();
   const navigate = useNavigate();
@@ -17,6 +26,25 @@ const LetterDraft = () => {
     filename: null,
   });
   const [pdfSuccess, setPdfSuccess] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({ type: '', message: '' }); // Add this state
+
+  // Function to show alert message
+  const showAlert = (type, message) => {
+    setAlertMessage({ type, message });
+    // Auto-hide the alert after 5 seconds
+    setTimeout(() => {
+      setAlertMessage({ type: '', message: '' });
+    }, 5000);
+  };
+
+  // Add this at the beginning of the component
+  useEffect(() => {
+    // Check if user is logged in
+    const userData = localStorage.getItem("user");
+    if (!userData) {
+      setError("You must be logged in to create or edit drafts");
+    }
+  }, []);
 
   // Effect to fetch draft data when editing an existing draft
   useEffect(() => {
@@ -54,7 +82,7 @@ const LetterDraft = () => {
     });
   };
 
-  // Then use it in your API calls
+  // Submit letter data to generate PDF
   const submitLetterData = async (templateType) => {
     setLoading(true);
     try {
@@ -81,9 +109,11 @@ const LetterDraft = () => {
 
       // Show success message
       setPdfSuccess(true);
+      // Show alert at the top
+      showAlert('success', 'PDF generated successfully! You can download or view it now.');
     } catch (error) {
       console.error("Failed to Generate PDF:", error);
-      alert("Failed to generate PDF. Please try again.");
+      showAlert('error', 'Failed to generate PDF. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -111,25 +141,40 @@ const LetterDraft = () => {
     }
   };
 
-  // Replace the saveDraft function with this version
+  // Update the saveDraft function
   const saveDraft = async (letterType) => {
     setLoading(true);
     setError(null);
     setSaveSuccess(false);
 
     try {
-      // If we have a draftId, update the existing draft
+      // Determine endpoint based on whether we're updating or creating
       const endpoint = savedDraftId
         ? `http://localhost:8000/api/letters/drafts/${savedDraftId}/`
         : "http://localhost:8000/api/letters/drafts/save/";
 
       const method = savedDraftId ? "put" : "post";
+      const token = getAuthToken();
 
-      // Removed token requirement
-      const response = await axios[method](endpoint, {
-        letter_type: letterType,
-        template_data: formData,
-      });
+      if (!token) {
+        setError("You must be logged in to save drafts");
+        setLoading(false);
+        return;
+      }
+
+      // Include authorization header with token
+      const response = await axios[method](
+        endpoint,
+        {
+          letter_type: letterType,
+          template_data: formData,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 201 || response.status === 200) {
         // If this was a new draft, store the ID for future updates
@@ -138,7 +183,10 @@ const LetterDraft = () => {
         }
 
         setSaveSuccess(true);
-        // Show success message for 3 seconds
+        // Show success alert at the top
+        showAlert('success', 'Draft saved successfully! You can access it later from "My Saved Drafts"');
+        
+        // Reset success state after 3 seconds
         setTimeout(() => {
           setSaveSuccess(false);
         }, 3000);
@@ -146,33 +194,22 @@ const LetterDraft = () => {
     } catch (error) {
       console.error("Failed to save draft:", error);
 
-      if (error.response) {
-        // The server responded with a status code outside the 2xx range
-        if (error.response.status === 401) {
-          setError("Failed to save draft. Please try again.");
-        } else if (error.response.data?.error) {
-          setError(`Failed to save draft: ${error.response.data.error}`);
-        } else {
-          setError(
-            `Failed to save draft. Server error (${error.response.status}).`
-          );
-        }
-      } else if (error.request) {
-        // The request was made but no response was received
-        setError("Failed to save draft. No response from the server.");
+      if (error.response?.status === 401) {
+        showAlert('error', 'Authentication error. Please log in again.');
+      } else if (error.response?.data?.error) {
+        showAlert('error', `Failed to save draft: ${error.response.data.error}`);
       } else {
-        // Something happened in setting up the request
-        setError(`Failed to save draft: ${error.message}`);
+        showAlert('error', 'Failed to save draft. Please try again.');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Function to handle template selection (no longer pre-fills data)
+  // Function to handle template selection
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
-    // Initialize with empty form data instead of user profile data
+    // Initialize with empty form data
     setFormData({});
   };
 
@@ -217,11 +254,55 @@ const LetterDraft = () => {
 
   return (
     <div className="flex-grow p-8">
+      {/* Alert message at the top */}
+      {alertMessage.message && (
+        <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-lg ${
+          alertMessage.type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700'
+        } border-l-4 p-4 rounded shadow-md`}>
+          <div className="flex items-center">
+            <div className="py-1 mr-3">
+              {alertMessage.type === 'success' ? (
+                <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
+            </div>
+            <div>
+              <p className="font-bold">{alertMessage.type === 'success' ? 'Success!' : 'Error!'}</p>
+              <p className="text-sm">{alertMessage.message}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main container */}
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
           Letter Drafting Assistant
         </h1>
+
+        {/* Error display */}
+        {error && (
+          <div
+            className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded"
+            role="alert"
+          >
+            <p className="font-bold">Error</p>
+            <p>{error}</p>
+            {error.includes("logged in") && (
+              <button
+                onClick={() => navigate("/login")}
+                className="mt-2 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded transition-colors"
+              >
+                Go to Login
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Letter options container */}
         {!selectedTemplate ? (
@@ -722,68 +803,48 @@ const LetterDraft = () => {
               )}
 
               {/* Action buttons */}
-              <div className="flex justify-between mt-8 pt-4 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                >
-                  Back to Templates
-                </button>
+            <div className="flex flex-wrap gap-4 mt-8 pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors w-auto"
+              >
+                Back to Templates
+              </button>
 
-                <div className="space-x-4">
-                  {/* Show error message if there is one */}
-                  {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                      {error}
-                      <div className="mt-2">
-                        <button
-                          onClick={() => navigate("/drafts")}
-                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                        >
-                          Back to Drafts
-                        </button>
-                      </div>
-                    </div>
-                  )}
+              <div className="flex-grow"></div>
 
-                  {/* Show success message if save was successful */}
-                  {saveSuccess && (
-                    <div className="text-green-500 text-sm mb-2">
-                      Draft saved successfully!
-                    </div>
-                  )}
+              <button
+                type="button"
+                onClick={() => saveDraft(selectedTemplate)}
+                className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={loading}
+              >
+                {loading ? "Saving..." : "Save Draft"}
+              </button>
 
-                  <button
-                    type="button"
-                    onClick={() => saveDraft(selectedTemplate)}
-                    className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ${
-                      loading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    disabled={loading}
-                  >
-                    {loading ? "Saving..." : "Save Draft"}
-                  </button>
-
-                  <button
-                    type="submit"
-                    className={`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors ${
-                      loading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    disabled={loading}
-                  >
-                    {loading ? "Generating..." : "Generate PDF"}
-                  </button>
-                </div>
-              </div>
+              <button
+                type="submit"
+                className={`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={loading}
+              >
+                {loading ? "Generating..." : "Generate PDF"}
+              </button>
+            </div>
             </form>
           </div>
         )}
       </div>
+      
+      {/* PDF Success buttons for download and view */}
       {pdfSuccess && (
         <div className="fixed bottom-8 right-8 bg-white p-4 rounded-lg shadow-lg border border-gray-200 z-10">
           <h4 className="text-lg font-medium text-green-700 mb-3">
-            PDF Generated Successfully!
+            Your PDF is ready
           </h4>
           <div className="space-y-2">
             <button

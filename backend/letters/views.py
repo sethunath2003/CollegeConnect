@@ -20,16 +20,10 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])  # Add this line to require auth
 def save_letter_draft(request):
     """
     API endpoint to save a letter draft to the database.
-    
-    Accepts:
-        - letter_type: Type of letter (internship, dutyleave, etc.)
-        - template_data: JSON data for the template
-        
-    Returns:
-        - Success response with draft ID or error message
     """
     try:
         # Extract data from request
@@ -40,9 +34,9 @@ def save_letter_draft(request):
         if not letter_type or not template_data:
             return Response({'error': 'Missing letter type or template data'}, status=400)
         
-        # Create anonymous draft
+        # Create draft associated with the authenticated user
         draft = LetterDraft.objects.create(
-            user_id=1,  # Use a default anonymous user (you need to create this user in the database)
+            user=request.user,  # Use the authenticated user
             letter_type=letter_type,
             template_data=template_data
         )
@@ -284,15 +278,15 @@ def get_letter_drafts(request):
     return Response({'drafts': drafts_data})
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Add this to require authentication
 def list_letter_drafts(request):
     """
-    List all letter drafts (limited to 20 most recent).
-    
-    Returns:
-        - JSON array of draft objects
+    List all letter drafts for the authenticated user.
     """
-    drafts = LetterDraft.objects.all().order_by('-created_at')[:20]
-    # Create a simple serialization since we don't have the serializer module
+    # Get drafts for the current authenticated user only
+    drafts = LetterDraft.objects.filter(user=request.user).order_by('-updated_at')
+    
+    # Convert to list of dictionaries
     drafts_data = []
     for draft in drafts:
         drafts_data.append({
@@ -302,6 +296,7 @@ def list_letter_drafts(request):
             'created_at': draft.created_at.isoformat(),
             'updated_at': draft.updated_at.isoformat()
         })
+    
     return Response(drafts_data)
 
 @api_view(['GET', 'PUT', 'DELETE'])

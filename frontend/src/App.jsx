@@ -15,6 +15,8 @@ import Services from "./pages/Services";
 import BookedByMe from "./modules/Books/BookedByMe";
 import PostedByMe from "./modules/Books/PostedByMe";
 import EventsPage from "./pages/EventsPage";
+import ViewDrafts from "./modules/Letters/ViewDrafts";
+import EditDraft from "./modules/Letters/EditDraft";
 
 function App() {
   const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
@@ -22,13 +24,23 @@ function App() {
 
   // Track user activity and handle auto-logout
   useEffect(() => {
-    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "click"];
+    const events = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+      "click",
+    ];
     const updateActivity = () => setLastActivity(Date.now());
-    
-    events.forEach(event => window.addEventListener(event, updateActivity));
+
+    events.forEach((event) => window.addEventListener(event, updateActivity));
 
     const checkInactivity = setInterval(() => {
-      if (Date.now() - lastActivity > INACTIVITY_TIMEOUT && localStorage.getItem("token")) {
+      if (
+        Date.now() - lastActivity > INACTIVITY_TIMEOUT &&
+        localStorage.getItem("token")
+      ) {
         // Logout user
         localStorage.removeItem("user");
         localStorage.removeItem("token");
@@ -40,7 +52,9 @@ function App() {
     }, 60000); // Check every minute
 
     return () => {
-      events.forEach(event => window.removeEventListener(event, updateActivity));
+      events.forEach((event) =>
+        window.removeEventListener(event, updateActivity)
+      );
       clearInterval(checkInactivity);
     };
   }, [lastActivity]);
@@ -48,12 +62,14 @@ function App() {
   // Set up authentication interceptor
   useEffect(() => {
     const interceptor = axios.interceptors.request.use(
-      config => {
+      (config) => {
         const token = localStorage.getItem("token");
-        if (token) config.headers["Authorization"] = `Bearer ${token}`;
+        if (token) {
+          config.headers["Authorization"] = `Bearer ${token}`;
+        }
         return config;
       },
-      error => Promise.reject(error)
+      (error) => Promise.reject(error)
     );
 
     return () => axios.interceptors.request.eject(interceptor);
@@ -76,6 +92,8 @@ function App() {
           <Route path="/bookexchange/posted" element={<PostedByMe />} />
           <Route path="/services" element={<Services />} />
           <Route path="/eventlister" element={<EventsPage />} />
+          <Route path="/drafts" element={<ViewDrafts />} />
+          <Route path="/edit-draft/:draftId" element={<EditDraft />} />
         </Routes>
       </div>
     </Router>
