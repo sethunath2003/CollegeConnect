@@ -22,7 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
 # Python cache files
 __pycache__/
 *.py[cod]
@@ -30,3 +29,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+.venv/
+.env
+db.sqlite3
+media/
