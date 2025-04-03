@@ -63,13 +63,16 @@ def register_user(request):
         password=data['password']
     )
     
+    # Generate tokens using the helper function
+    tokens = get_tokens_for_user(user)
+    
     # Return success response with user details
     return Response({
         'message': 'User created successfully',
         'user_id': user.id,
         'username': user.username,
         'email': user.email,
-        'token':token['access']
+        'token': tokens['access']
     }, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
