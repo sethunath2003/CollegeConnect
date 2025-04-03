@@ -314,12 +314,13 @@ const PostedByMe = () => {
                     </p>
 
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => handleViewBook(book.id)}
-                        className="flex-1 text-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                      <Link
+                        to={`/bookexchange/book/${book.id}`}
+                        state={{ from: "/bookexchange/posted" }}
+                        className="block text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                       >
-                        View
-                      </button>
+                        View Details
+                      </Link>
 
                       {!book.booker_name && (
                         <>

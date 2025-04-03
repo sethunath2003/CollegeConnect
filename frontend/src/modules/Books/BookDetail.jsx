@@ -26,19 +26,18 @@ const BookDetail = () => {
   const getPreviousPath = () => {
     // Check if we have state from navigation indicating where the user came from
     if (location.state && location.state.from) {
+      console.log("Navigating back to:", location.state.from); // Debug log
       return location.state.from;
     }
 
     // If we don't have navigation state, try to determine from the book data
     if (book) {
-      // If the current user is the booker, they likely came from "Books I Booked"
       const userData = localStorage.getItem("user");
       if (userData) {
         const user = JSON.parse(userData);
         if (book.booker_name === user.username) {
           return "/bookexchange/booked";
         }
-        // If the current user is the owner, they likely came from "Books I Posted"
         if (book.owner_name === user.username) {
           return "/bookexchange/posted";
         }
