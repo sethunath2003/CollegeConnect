@@ -379,18 +379,29 @@ const BookList = () => {
                         )}
                       </div>
                     ) : (
-                      <button
-                        onClick={() => {
-                          if (!userLoggedIn) {
-                            navigate("/login");
-                            return;
-                          }
-                          setBookingBookId(book.id);
-                        }}
-                        className="block w-full text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                      >
-                        Book Now
-                      </button>
+                      <div className="flex gap-2 mb-4">
+                        <Link
+                          to={`/bookexchange/book/${book.id}`}
+                          state={{ from: "/bookexchange" }}
+                          className="flex-1 text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          View Details
+                        </Link>
+                        {!book.booker_name && (
+                          <button
+                            onClick={() => {
+                              if (!userLoggedIn) {
+                                navigate("/login");
+                                return;
+                              }
+                              setBookingBookId(book.id);
+                            }}
+                            className="flex-1 text-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                          >
+                            Book Now
+                          </button>
+                        )}
+                      </div>
                     ))}
                 </div>
               </div>

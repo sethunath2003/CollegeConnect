@@ -113,7 +113,7 @@ const Signup = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-[80vh] p-4">
+    <div className="flex justify-center items-center min-h-[80vh] p-4 saintgits-bg">
       {/* Popup Container */}
       {popup.show && (
         <div

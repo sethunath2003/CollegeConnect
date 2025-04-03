@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios from "axios";
 // Import components
 import Layout from "./components/Layout";
+import About from "./pages/About"
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -80,10 +81,12 @@ function App() {
       <div className="min-h-screen flex flex-col bg-gray-900">
         <Layout />
         <Routes>
+          <Route path="/homepage" element={<Homepage />} />
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/homepage" element={<Homepage />} />
+          <Route path="/about" element={<About />} />
+         
           <Route path="/letter-drafting" element={<LetterDraft />} />
           <Route path="/bookexchange" element={<BookList />} />
           <Route path="/bookexchange/post" element={<BookPost />} />

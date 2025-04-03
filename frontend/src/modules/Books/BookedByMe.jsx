@@ -124,6 +124,7 @@ const BookedByMe = () => {
                   </p>
                   <Link
                     to={`/bookexchange/book/${book.id}`}
+                    state={{ from: "/bookexchange/booked" }}
                     className="block text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                   >
                     View Details
