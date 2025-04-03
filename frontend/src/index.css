@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap"); */
 
 /* CSS Variables */
 :root {
@@ -980,4 +980,18 @@ header.bg-gray-900 {
 
 .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 > div button.w-full {
   margin-top: auto;
+}
+
+/* Background with Saintgits image for landing page */
+.saintgits-bg {
+  background-image: linear-gradient(
+      rgba(17, 24, 39, 0.6),
+      /* Reduced from 0.75 to 0.6 */ rgba(17, 24, 39, 0.7)
+        /* Reduced from 0.85 to 0.7 */
+    ),
+    url("/Saintgits.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }

@@ -31,102 +31,95 @@ const Homepage = () => {
   }
 
   return (
-    <main className="py-6 px-4 mb-4">
-      {/* Welcome message with user's name */}
-      <div className="mb-6">
-        <h1 className="text-2xl text-center font-bold text-white">
-          Welcome, {username}!
-          <p className="text-gray-300">What would you like to do today?</p>
-        </h1>
-      </div>
-      {/* Changed to 2-column layout on larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Letter Drafting Card */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-          <div className="h-48 bg-blue-100 flex items-center justify-center">
-            <img
-              src="/LetterDrafting.jpg"
-              alt="Letter Drafting"
-              className="w-full h-full object-contain" /* Changed from object-cover to object-contain */
-            />
-          </div>
-          <div className="p-8">
-            <h2 className="text-2xl font-bold mb-4">Letter Drafting</h2>
-            <p className="mb-6 text-gray-600">
-              Create professional letters for internships, leave applications,
-              and permissions.
-            </p>
+    <div className="min-h-screen flex flex-col bg-gray-200 saintgits-bg">
+      <main className="flex-grow max-w-7xl mx-auto p-6 md:p-12">
+        <div className="text-center mb-8">
+          <h3 className="text-3xl font-bold text-white">
+            Welcome to CollegeConnect, {username}!
+          </h3>
+          <h4 className="text-xl text-gray-100 mt-2">
+            Your gateway to College resources, networking and opportunities
+          </h4>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Letter Drafting Card */}
+          <div className="bg-white rounded-lg shadow-xl border border-gray-300 p-6 text-center hover:shadow-2xl transition-shadow">
+            <div className="w-36 h-36 rounded-full overflow-hidden mx-auto mb-4 shadow-md">
+              <img
+                src="/LetterDrafting.jpg"
+                alt="Compose"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <h3 className="text-xl font-bold mb-3">Compose</h3>
+            <h4 className="text-gray-600 mb-6">
+              Get Assistance in drafting letters for applications, internships
+              and more
+            </h4>
             <Link to="/letter-drafting">
-              <button className="w-full bg-gray-900 hover:bg-gray-700 text-white py-3 px-6 rounded-lg transition-colors">
+              <button className="px-4 py-2 rounded w-full text-white bg-gray-900 hover:bg-gray-700 transition-colors">
                 Start Drafting
               </button>
             </Link>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-8">
-          {/* Study Material Exchange Card - Now in second column */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-            <div className="h-40 bg-green-100 flex items-center justify-center">
+          {/* Study Material Exchange Card */}
+          <div className="bg-white rounded-lg shadow-xl border border-gray-300 p-6 text-center hover:shadow-2xl transition-shadow">
+            <div className="w-36 h-36 rounded-full overflow-hidden mx-auto mb-4 shadow-md">
               <img
                 src="/Book exchange.jpg"
                 alt="Study Material Exchange"
-                className="w-full h-full object-contain" /* Changed from object-cover to object-contain */
+                className="w-full h-full object-cover"
               />
             </div>
-            <div className="p-8">
-              <h2 className="text-2xl font-bold mb-4">
-                Study Material Exchange
-              </h2>
-              <p className="mb-6 text-gray-600">
-                Share and find textbooks, notes and study materials.
-              </p>
-              <div className="flex space-x-4">
-                <Link to="/bookexchange" className="flex-1">
-                  <button className="w-full bg-gray-900 hover:bg-gray-700 text-white py-3 px-6 rounded-lg transition-colors">
-                    Browse Materials
-                  </button>
-                </Link>
-                <Link to="/bookexchange/post" className="flex-1">
-                  <button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg transition-colors">
-                    Post Item
-                  </button>
-                </Link>
-              </div>
+            <h3 className="text-xl font-bold mb-3">Study Material Exchange</h3>
+            <h4 className="text-gray-600 mb-6">
+              Share and access a variety of study materials with your peers
+            </h4>
+            <div className="flex gap-3">
+              <Link to="/bookexchange" className="flex-1">
+                <button className="w-full bg-gray-900 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors">
+                  Browse
+                </button>
+              </Link>
+              <Link to="/bookexchange/post" className="flex-1">
+                <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition-colors">
+                  Post Item
+                </button>
+              </Link>
             </div>
           </div>
 
-          {/* Events and Hackathons Card - Now in second column */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-            <div className="h-40 bg-purple-100 flex items-center justify-center">
+          {/* Events & Hackathons Card */}
+          <div className="bg-white rounded-lg shadow-xl border border-gray-300 p-6 text-center hover:shadow-2xl transition-shadow">
+            <div className="w-36 h-36 rounded-full overflow-hidden mx-auto mb-4 shadow-md">
               <img
                 src="/Hackathon.jpg"
-                alt="Events and Hackathons"
-                className="w-full h-full object-fill" /* Changed from object-cover to object-contain */
+                alt="Events"
+                className="w-full h-full object-cover"
               />
             </div>
-            <div className="p-8">
-              <h2 className="text-2xl font-bold mb-4">Events and Hackathons</h2>
-              <p className="mb-6 text-gray-600">
-                Stay updated on upcoming events and hackathons.
-              </p>
-              <div className="flex space-x-4">
-                <Link to="/eventlister" className="flex-1">
-                  <button className="w-full bg-gray-900 hover:bg-gray-700 text-white py-3 px-6 rounded-lg transition-colors">
-                    View Events
-                  </button>
-                </Link>
-                <Link to="/events/new" className="flex-1">
-                  <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg transition-colors">
-                    Post Event
-                  </button>
-                </Link>
-              </div>
-            </div>
+            <h3 className="text-xl font-bold mb-3">Events & Hackathons</h3>
+            <h4 className="text-gray-600 mb-6">
+              Participate in exciting events and hackathons to showcase your
+              skills
+            </h4>
+            <Link to="/eventlister">
+              <button className="w-full bg-gray-900 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors">
+                View Events
+              </button>
+            </Link>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      <footer className="bg-gray-900 text-white p-4 text-center">
+        <div className="footer-text">
+          © {new Date().getFullYear()} College Connect. All rights reserved.
+        </div>
+      </footer>
+    </div>
   );
 };
 

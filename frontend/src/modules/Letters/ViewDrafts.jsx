@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
 
-const LetterDrafts = () => {
+const ViewDrafts = () => {
   const navigate = useNavigate();
   const [drafts, setDrafts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,14 +14,31 @@ const LetterDrafts = () => {
   useEffect(() => {
     const fetchDrafts = async () => {
       try {
+        // Get authentication token directly
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("You must be logged in to view drafts");
+          setLoading(false);
+          return;
+        }
+
         const response = await axios.get(
-          "http://localhost:8000/api/letters/drafts/"
+          "http://localhost:8000/api/letters/drafts/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         setDrafts(response.data);
       } catch (err) {
         console.error("Failed to fetch drafts:", err);
-        setError("Failed to load drafts. Please try again.");
+        if (err.response?.status === 401) {
+          setError("Authentication error. Please log in again.");
+        } else {
+          setError("Failed to load drafts. Please try again.");
+        }
       } finally {
         setLoading(false);
       }
@@ -68,7 +85,7 @@ const LetterDrafts = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-blue-600">My Saved Drafts</h1>
           <button
-            onClick={() => navigate("/letter-draft")}
+            onClick={() => navigate("/letter-drafting")}
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
           >
             Create New Letter
@@ -100,40 +117,82 @@ const LetterDrafts = () => {
             {drafts.map((draft) => (
               <div
                 key={draft.id}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
               >
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-semibold text-blue-700">
-                      {draft.letter_type.charAt(0).toUpperCase() +
-                        draft.letter_type.slice(1)}{" "}
-                      Letter
+                      {draft.letter_type === "internship" &&
+                        "Internship Request"}
+                      {draft.letter_type === "application" &&
+                        "Application Letter"}
+                      {draft.letter_type === "recommendation" &&
+                        "Recommendation Request"}
+                      {draft.letter_type === "dutyleave" &&
+                        "Duty Leave Application"}
+                      {draft.letter_type === "permission" &&
+                        "Permission Letter"}
+                      {draft.letter_type === "custom" && "Custom Letter"}
                     </h3>
                     <p className="text-gray-500 text-sm">
-                      Created: {new Date(draft.created_at).toLocaleDateString()}
+                      Created: {new Date(draft.created_at).toLocaleString()}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      Updated: {new Date(draft.updated_at).toLocaleString()}
                     </p>
                   </div>
                   <div className="space-x-2">
                     <button
                       onClick={() => editDraft(draft.id)}
-                      className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                      className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => deleteDraft(draft.id)}
-                      className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "Are you sure you want to delete this draft?"
+                          )
+                        ) {
+                          deleteDraft(draft.id);
+                        }
+                      }}
+                      className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
                     >
                       Delete
                     </button>
                   </div>
                 </div>
-                <div className="mt-2">
-                  <p className="text-gray-600 truncate">
-                    {draft.template_data.yourName
-                      ? `Name: ${draft.template_data.yourName}`
-                      : "No name provided"}
-                  </p>
+
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <h4 className="font-medium text-gray-700 mb-1">
+                    Draft Details:
+                  </h4>
+                  {draft.template_data.yourName && (
+                    <p className="text-gray-600 text-sm">
+                      <span className="font-medium">Name:</span>{" "}
+                      {draft.template_data.yourName}
+                    </p>
+                  )}
+                  {draft.template_data.Date && (
+                    <p className="text-gray-600 text-sm">
+                      <span className="font-medium">Date:</span>{" "}
+                      {draft.template_data.Date}
+                    </p>
+                  )}
+                  {draft.template_data.companyName && (
+                    <p className="text-gray-600 text-sm">
+                      <span className="font-medium">Company:</span>{" "}
+                      {draft.template_data.companyName}
+                    </p>
+                  )}
+                  {draft.template_data.eventName && (
+                    <p className="text-gray-600 text-sm">
+                      <span className="font-medium">Event:</span>{" "}
+                      {draft.template_data.eventName}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -144,4 +203,4 @@ const LetterDrafts = () => {
   );
 };
 
-export default LetterDrafts;
+export default ViewDrafts;

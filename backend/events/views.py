@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from django.views.generic import ListView
+
+from backend.events.scraper import scrape_events
 from .models import Event
 import requests
 from bs4 import BeautifulSoup
 from django.http import JsonResponse
+from rest_framework.decorators import api_view
 
 # Create your views here.
 
@@ -44,7 +47,20 @@ def run_scraper(request):
             "event_url": event_url
         })
 
-    data = {
+@api_view(['GET'])
+def run_scraper(request):
+    """Endpoint to trigger the scraper and return the latest events"""
+    # Run the scraper and save to database
+    events = scrape_events()
+    
+    # Count how many events have newly created=True
+    new_event_count = sum(1 for event in events if event.get('newly_created', False))
+    
+    # Return the scraped events with count info
+    return JsonResponse({
         "status": 200,
-        "events": events
-    }
+        "message": f"Successfully scraped {len(events)} events. Found {new_event_count} new events!",
+        "events": events,
+        "new_event_count": new_event_count,
+        "total_event_count": len(events)
+    })
