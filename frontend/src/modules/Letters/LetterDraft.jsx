@@ -1,63 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import LoadingScreen from "../../components/LoadingScreen";
-
-// Add this function to get the authentication token
-const getAuthToken = () => {
-  // Get token directly from localStorage
-  const token = localStorage.getItem("token");
-  if (!token) return null;
-
-  return token;
-};
+import { useNavigate, useParams } from "react-router-dom";
 
 const LetterDraft = () => {
-  const { draftId } = useParams();
   const navigate = useNavigate();
-  const [savedDraftId, setSavedDraftId] = useState(draftId || null);
-  const [loading, setLoading] = useState(draftId ? true : false);
+  const { draftId } = useParams();
+  
+  const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [generatedPDF, setGeneratedPDF] = useState({
-    url: null,
-    filename: null,
-  });
+  const [savedDraftId, setSavedDraftId] = useState(null);
   const [pdfSuccess, setPdfSuccess] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({ type: '', message: '' }); // Add this state
-
-  // Function to show alert message
-  const showAlert = (type, message) => {
-    setAlertMessage({ type, message });
-    // Auto-hide the alert after 5 seconds
-    setTimeout(() => {
-      setAlertMessage({ type: '', message: '' });
-    }, 5000);
-  };
-
-  // Add this at the beginning of the component
+  const [pdfData, setPdfData] = useState(null);
+  const [alertMessage, setAlertMessage] = useState({ type: "", message: "" });
+  
+  // Fetch templates from backend
   useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem("user");
-    if (!userData) {
-      setError("You must be logged in to create or edit drafts");
-    }
+    const fetchTemplates = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/letters/templates/");
+        setTemplates(response.data);
+      } catch (error) {
+        console.error("Failed to fetch templates:", error);
+        setError("Failed to load letter templates. Please try again later.");
+      }
+    };
+    
+    fetchTemplates();
   }, []);
-
-  // Effect to fetch draft data when editing an existing draft
+  
+  // Fetch draft if draftId is provided
   useEffect(() => {
-    // If we have a draftId from URL, fetch that draft
     if (draftId) {
+      setLoading(true);
+      
       const fetchDraft = async () => {
         try {
-          setLoading(true);
           const response = await axios.get(
             `http://localhost:8000/api/letters/drafts/${draftId}/`
           );
-
-          // Set the template and form data
+          
           setSelectedTemplate(response.data.letter_type);
           setFormData(response.data.template_data);
           setSavedDraftId(response.data.id);
@@ -68,11 +52,18 @@ const LetterDraft = () => {
           setLoading(false);
         }
       };
-
+      
       fetchDraft();
     }
   }, [draftId]);
-
+  
+  // Handle template selection
+  const handleTemplateSelect = (templateType) => {
+    setSelectedTemplate(templateType);
+    // Reset form data when changing templates
+    setFormData({});
+  };
+  
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,8 +72,14 @@ const LetterDraft = () => {
       [name]: value,
     });
   };
-
-  // Submit letter data to generate PDF
+  
+  // Handle form submission to generate PDF
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    submitLetterData(selectedTemplate);
+  };
+  
+  // Function to submit letter data and generate PDF
   const submitLetterData = async (templateType) => {
     setLoading(true);
     try {
@@ -92,169 +89,147 @@ const LetterDraft = () => {
           template: templateType,
           data: formData,
         },
-        {
-          responseType: "blob",
-        }
+        { responseType: "blob" }
       );
-
-      // Create a URL for the blob
-      const file = new Blob([response.data], { type: "application/pdf" });
-      const fileURL = URL.createObjectURL(file);
-
-      // Store the file URL for download
-      setGeneratedPDF({
-        url: fileURL,
-        filename: `${templateType}_letter.pdf`,
-      });
-
-      // Show success message
+      
+      // Create URL for the blob response
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const pdfUrl = URL.createObjectURL(blob);
+      
+      // Set PDF data and show success notification
+      setPdfData(pdfUrl);
       setPdfSuccess(true);
-      // Show alert at the top
-      showAlert('success', 'PDF generated successfully! You can download or view it now.');
+      setLoading(false);
     } catch (error) {
-      console.error("Failed to Generate PDF:", error);
-      showAlert('error', 'Failed to generate PDF. Please try again.');
-    } finally {
+      console.error("Failed to generate PDF:", error);
+      showAlert("error", "Failed to generate PDF. Please try again.");
       setLoading(false);
     }
   };
-
-  // Add function to download the PDF
-  const downloadPDF = () => {
-    if (!generatedPDF.url) return;
-
-    // Create an anchor element and set properties
-    const link = document.createElement("a");
-    link.href = generatedPDF.url;
-    link.download = generatedPDF.filename;
-
-    // Append to document, click and remove
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // Function to view the PDF in a new tab
-  const viewPDF = () => {
-    if (generatedPDF.url) {
-      window.open(generatedPDF.url);
-    }
-  };
-
-  // Update the saveDraft function
-  const saveDraft = async (letterType) => {
+  
+  // Function to save draft
+  const saveDraft = async (templateType) => {
     setLoading(true);
-    setError(null);
-    setSaveSuccess(false);
-
     try {
-      // Determine endpoint based on whether we're updating or creating
-      const endpoint = savedDraftId
-        ? `http://localhost:8000/api/letters/drafts/${savedDraftId}/`
-        : "http://localhost:8000/api/letters/drafts/save/";
-
-      const method = savedDraftId ? "put" : "post";
-      const token = getAuthToken();
-
-      if (!token) {
-        setError("You must be logged in to save drafts");
-        setLoading(false);
-        return;
+      let response;
+      const draftData = {
+        letter_type: templateType,
+        template_data: formData,
+      };
+      
+      if (savedDraftId) {
+        // Update existing draft
+        response = await axios.put(
+          `http://localhost:8000/api/letters/drafts/${savedDraftId}/`,
+          draftData
+        );
+      } else {
+        // Create new draft
+        response = await axios.post(
+          "http://localhost:8000/api/letters/drafts/save/",
+          draftData
+        );
+        setSavedDraftId(response.data.id);
       }
-
-      // Include authorization header with token
-      const response = await axios[method](
-        endpoint,
-        {
-          letter_type: letterType,
-          template_data: formData,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 201 || response.status === 200) {
-        // If this was a new draft, store the ID for future updates
-        if (response.data.id) {
-          setSavedDraftId(response.data.id);
-        }
-
-        setSaveSuccess(true);
-        // Show success alert at the top
-        showAlert('success', 'Draft saved successfully! You can access it later from "My Saved Drafts"');
-        
-        // Reset success state after 3 seconds
-        setTimeout(() => {
-          setSaveSuccess(false);
-        }, 3000);
-      }
+      
+      showAlert("success", "Draft saved successfully!");
     } catch (error) {
       console.error("Failed to save draft:", error);
-
-      if (error.response?.status === 401) {
-        showAlert('error', 'Authentication error. Please log in again.');
-      } else if (error.response?.data?.error) {
-        showAlert('error', `Failed to save draft: ${error.response.data.error}`);
-      } else {
-        showAlert('error', 'Failed to save draft. Please try again.');
-      }
+      showAlert("error", "Failed to save draft. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
-  // Function to handle template selection
-  const handleTemplateSelect = (template) => {
-    setSelectedTemplate(template);
-    // Initialize with empty form data
-    setFormData({});
+  
+  // Function to show alert message
+  const showAlert = (type, message) => {
+    setAlertMessage({ type, message });
+    setTimeout(() => {
+      setAlertMessage({ type: "", message: "" });
+    }, 5000);
   };
-
-  // Go back to template selection
+  
+  // Function to go back to templates
   const handleBack = () => {
     setSelectedTemplate(null);
+    setFormData({});
+    setSavedDraftId(null);
   };
-
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    submitLetterData(selectedTemplate);
+  
+  // Functions to handle PDF actions
+  const downloadPDF = () => {
+    if (pdfData) {
+      const link = document.createElement("a");
+      link.href = pdfData;
+      link.download = `${selectedTemplate}_letter.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
-
-  if (loading) {
-    return (
-      <LoadingScreen
-        message={
-          draftId ? "Loading your draft..." : "Processing your request..."
-        }
-      />
-    );
-  }
-
-  if (error && draftId) {
-    return (
-      <div className="flex-grow p-8">
-        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-          <button
-            onClick={() => navigate("/drafts")}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            Back to Drafts
-          </button>
+  
+  const viewPDF = () => {
+    if (pdfData) {
+      window.open(pdfData, "_blank");
+    }
+  };
+  
+  // Get template data for the selected template
+  const getSelectedTemplateData = () => {
+    return templates.find(t => t.template_type === selectedTemplate);
+  };
+  
+  // Render dynamic form fields based on template structure
+  const renderFormFields = () => {
+    const template = getSelectedTemplateData();
+    if (!template || !template.form_structure) return null;
+    
+    return template.form_structure.map((section, sectionIndex) => (
+      <div 
+        key={sectionIndex} 
+        className={`${section.section_class || 'bg-gray-50'} p-4 rounded-lg mb-6`}
+      >
+        <h3 className="text-lg font-medium text-blue-700 mb-3">
+          {section.section_title}
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {section.fields.map((field, fieldIndex) => (
+            <div key={fieldIndex}>
+              <label className="block text-gray-700 mb-2">
+                {field.label}:
+              </label>
+              
+              {field.type === 'textarea' ? (
+                <textarea
+                  name={field.name}
+                  value={formData[field.name] || ""}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded h-32"
+                  required={field.required}
+                  placeholder={field.placeholder || ""}
+                ></textarea>
+              ) : (
+                <input
+                  type={field.type}
+                  name={field.name}
+                  value={formData[field.name] || ""}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded"
+                  required={field.required}
+                  placeholder={field.placeholder || ""}
+                />
+              )}
+            </div>
+          ))}
         </div>
       </div>
-    );
-  }
-
+    ));
+  };
+  
   return (
     <div className="flex-grow p-8">
-      {/* Alert message at the top */}
+      {/* Alert message component */}
       {alertMessage.message && (
         <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-lg ${
           alertMessage.type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700'
@@ -278,14 +253,13 @@ const LetterDraft = () => {
           </div>
         </div>
       )}
-
-      {/* Main container */}
+      
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">
           Letter Drafting Assistant
         </h1>
-
-        {/* Error display */}
+        
+        {/* Display error message if any */}
         {error && (
           <div
             className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded"
@@ -303,64 +277,33 @@ const LetterDraft = () => {
             )}
           </div>
         )}
-
-        {/* Letter options container */}
+        
+        {/* Template selection view */}
         {!selectedTemplate ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             <h2 className="text-xl font-semibold text-gray-700 col-span-full mb-4">
               Select Letter Type:
             </h2>
-
-            {/* Internship Letter */}
-            <div className="bg-green-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-green-700 mb-2">
-                Internship Request
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Draft a compelling internship request to gain valuable
-                experience.
-              </p>
-              <button
-                onClick={() => handleTemplateSelect("internship")}
-                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors w-full"
-              >
-                Get Started
-              </button>
-            </div>
-
-            {/* Leave Application */}
-            <div className="bg-yellow-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-yellow-700 mb-2">
-                Leave Application
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Create a formal request for leave of absence from your studies.
-              </p>
-              <button
-                onClick={() => handleTemplateSelect("dutyleave")}
-                className="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors w-full"
-              >
-                Get Started
-              </button>
-            </div>
-
-            {/* Permission Letter */}
-            <div className="bg-red-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-red-700 mb-2">
-                Permission Letter
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Request permission for special circumstances or events.
-              </p>
-              <button
-                onClick={() => handleTemplateSelect("permission")}
-                className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors w-full"
-              >
-                Get Started
-              </button>
-            </div>
-
-            {/* Add this button at the end */}
+            
+            {/* Render template cards dynamically from fetched templates */}
+            {templates.map((template, index) => (
+              <div key={index} className={`bg-${template.color_class}-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all`}>
+                <h3 className={`text-lg font-semibold text-${template.color_class}-700 mb-2`}>
+                  {template.name}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {template.description}
+                </p>
+                <button
+                  onClick={() => handleTemplateSelect(template.template_type)}
+                  className={`bg-${template.color_class}-500 text-white py-2 px-4 rounded hover:bg-${template.color_class}-600 transition-colors w-full`}
+                >
+                  Get Started
+                </button>
+              </div>
+            ))}
+            
+            {/* Saved drafts card */}
             <div className="bg-blue-50 rounded-lg p-6 shadow-md hover:shadow-lg transition-all">
               <h3 className="text-lg font-semibold text-blue-700 mb-2">
                 My Saved Drafts
@@ -379,16 +322,9 @@ const LetterDraft = () => {
         ) : (
           <div className="bg-gray-50 p-6 rounded-lg">
             <h2 className="text-2xl font-semibold text-blue-700 mb-6">
-              {selectedTemplate === "application" && "Application Letter"}
-              {selectedTemplate === "internship" && "Internship Request Letter"}
-              {selectedTemplate === "recommendation" &&
-                "Recommendation Request Letter"}
-              {selectedTemplate === "dutyleave" &&
-                "Duty Leave Application Letter"}
-              {selectedTemplate === "permission" && "Permission Letter"}
-              {selectedTemplate === "custom" && "Custom Letter"}
+            {(getSelectedTemplateData()?.name) || "Letter Template"}
             </h2>
-
+            
             <form className="space-y-4" onSubmit={handleSubmit}>
               {/* User profile information - no longer pre-filled */}
               <div className="bg-blue-50 p-4 rounded-lg mb-6">
@@ -586,21 +522,6 @@ const LetterDraft = () => {
                       placeholder="e.g. IEEE, Institution Name, Department"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-gray-700 mb-2">
-                      Event Date:
-                    </label>
-                    <input
-                      type="date"
-                      name="eventDate"
-                      value={formData.eventDate || ""}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                      required
-                    />
-                  </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-gray-700 mb-2">
@@ -840,7 +761,7 @@ const LetterDraft = () => {
         )}
       </div>
       
-      {/* PDF Success buttons for download and view */}
+      {/* PDF success notification */}
       {pdfSuccess && (
         <div className="fixed bottom-8 right-8 bg-white p-4 rounded-lg shadow-lg border border-gray-200 z-10">
           <h4 className="text-lg font-medium text-green-700 mb-3">

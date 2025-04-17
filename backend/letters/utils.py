@@ -6,6 +6,8 @@ from django.template.loader import render_to_string
 import io
 import os
 from django.conf import settings
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 def generate_pdf_from_template(data, template_name):
     """
@@ -64,3 +66,92 @@ def generate_pdf_from_template(data, template_name):
         print(f"PDF generation error: {e}")
         # Return error information
         return {'error': str(e), 'status': 500}
+
+def generate_pdf_from_template_structure(structure, data):
+    """
+    Generate PDF using a template structure from the database
+    
+    Args:
+        structure: JSON structure defining the PDF layout
+        data: Form data to populate the template
+        
+    Returns:
+        BytesIO buffer containing the generated PDF
+    """
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, 
+                          rightMargin=72, leftMargin=72,
+                          topMargin=72, bottomMargin=72)
+    
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Create custom styles
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Title'],
+        fontSize=14,
+        alignment=1,  # Center alignment
+    )
+    
+    body_style = ParagraphStyle(
+        'Body',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=12,
+    )
+    
+    # Process each section in the template structure
+    for section in structure.get('sections', []):
+        section_type = section.get('type')
+        
+        if section_type == 'title':
+            # Title element
+            elements.append(Paragraph(section.get('text', ''), title_style))
+            
+        elif section_type == 'spacer':
+            # Spacer element
+            size = section.get('size', 0.2)
+            elements.append(Spacer(1, size * inch))
+            
+        elif section_type == 'date':
+            # Date element from form data
+            date_field = section.get('field', 'Date')
+            elements.append(Paragraph(data.get(date_field, ''), styles['Normal']))
+            
+        elif section_type == 'recipient':
+            # Recipient section
+            elements.append(Paragraph('To', styles['Normal']))
+            elements.append(Paragraph(section.get('text', ''), styles['Normal']))
+            if 'field' in section:
+                elements.append(Paragraph(data.get(section['field'], ''), styles['Normal']))
+                
+        elif section_type == 'subject':
+            # Subject line
+            elements.append(Paragraph(f"Subject: {section.get('text', '')}", styles['Normal']))
+            
+        elif section_type == 'greeting':
+            # Greeting line
+            elements.append(Paragraph(section.get('text', 'Dear Sir/Madam,'), styles['Normal']))
+            
+        elif section_type == 'body':
+            # Main body text - replace placeholders with actual data
+            template_text = section.get('template', '')
+            # Replace all placeholders in format {field_name} with actual data
+            for field, value in data.items():
+                template_text = template_text.replace(f"{{{field}}}", str(value))
+            elements.append(Paragraph(template_text, body_style))
+            
+        elif section_type == 'closing':
+            # Closing line
+            elements.append(Paragraph(section.get('text', 'Yours sincerely,'), styles['Normal']))
+            
+        elif section_type == 'signature':
+            # Signature line - use field from data
+            field = section.get('field', 'yourName')
+            elements.append(Paragraph(data.get(field, ''), styles['Normal']))
+    
+    # Build PDF document
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
