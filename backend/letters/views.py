@@ -1,17 +1,19 @@
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .utils import generate_pdf_from_template
-from django.contrib.auth.decorators import login_required
-from .models import LetterDraft
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework import status
+import logging
+import json
+from .utils import generate_pdf_from_template, generate_pdf_from_template_structure
+from django.contrib.auth.decorators import login_required
+from .models import LetterDraft, LetterTemplate
+from .serializers import LetterTemplateSerializer, LetterDraftSerializer
 import io
 from django.conf import settings
 from django.templatetags.static import static
 import os
-# Import ReportLab components for PDF generation
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -19,345 +21,120 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])  # Add this line to require auth
-def save_letter_draft(request):
+logger = logging.getLogger(__name__)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_templates(request):
     """
-    API endpoint to save a letter draft to the database.
+    API endpoint to get all available letter templates.
+    Returns structure needed for the frontend form rendering.
     """
     try:
-        # Extract data from request
-        letter_type = request.data.get('letter_type')
-        template_data = request.data.get('template_data')
-        
-        # Validate required fields
-        if not letter_type or not template_data:
-            return Response({'error': 'Missing letter type or template data'}, status=400)
-        
-        # Create draft associated with the authenticated user
-        draft = LetterDraft.objects.create(
-            user=request.user,  # Use the authenticated user
-            letter_type=letter_type,
-            template_data=template_data
-        )
-        
-        # Return success response
-        return Response({
-            'status': 'success',
-            'message': 'Draft saved successfully',
-            'draft_id': draft.id,
-            'id': draft.id
-        }, status=201)
+        templates = LetterTemplate.objects.all().order_by('name')
+        serializer = LetterTemplateSerializer(templates, many=True)
+        return Response(serializer.data)
     except Exception as e:
-        # Return error response if any exception occurs
-        return Response({'error': str(e)}, status=500)
+        logger.error(f"Error fetching templates: {e}", exc_info=True)
+        return Response({'error': 'Could not retrieve templates.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def generate_letter(request):
     """
-    API endpoint to generate a PDF letter based on template and form data.
-    
-    Accepts:
-        - template: Type of letter template to use
-        - data: Form data to populate the template
-        
-    Returns:
-        - PDF file as HttpResponse or error message
+    API endpoint to generate a PDF letter based on a template_type and form_data.
+    Uses the backend LetterTemplate definition (pdf_structure).
     """
+    template_type = request.data.get('template_type')
+    form_data = request.data.get('data')
+
+    if not template_type or not form_data:
+        return Response({'error': 'Missing template_type or data'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        # Extract data from request
-        template_type = request.data.get('template')
-        form_data = request.data.get('data')
-        
-        # Validate required fields
-        if not template_type or not form_data:
-            return Response({'error': 'Missing template type or form data'}, status=400)
-        
-        # Generate PDF using helper function
-        pdf_buffer = generate_pdf_letter(template_type, form_data)
-        
-        # Prepare and return the PDF as HTTP response
+        template = LetterTemplate.objects.get(template_type=template_type)
+        is_valid, error_message = template.validate_data(form_data)
+        if not is_valid:
+            logger.warning(f"Validation failed for template '{template_type}': {error_message}")
+            return Response({'error': f'Invalid form data: {error_message}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        pdf_buffer = generate_pdf_from_template_structure(template.pdf_structure, form_data)
         response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="{template_type}_letter.pdf"'
+        safe_filename = "".join(c if c.isalnum() else "_" for c in template.name)
+        response['Content-Disposition'] = f'inline; filename="{safe_filename}_letter.pdf"'
         return response
+
+    except LetterTemplate.DoesNotExist:
+        logger.warning(f"Attempt to generate letter with non-existent template type: {template_type}")
+        return Response({'error': f'Template "{template_type}" not found.'}, status=status.HTTP_404_NOT_FOUND)
+    except ValueError as ve:
+        logger.error(f"PDF generation failed for template '{template_type}': {ve}", exc_info=True)
+        return Response({'error': f'PDF generation failed: {ve}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except Exception as e:
-        # Return error response if any exception occurs
-        return Response({'error': str(e)}, status=500)
+        logger.error(f"Unexpected error generating letter for template '{template_type}': {e}", exc_info=True)
+        return Response({'error': 'An unexpected error occurred during PDF generation.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def generate_pdf_letter(template_type, data):
-    """
-    Helper function to generate a PDF letter based on template type and data.
-    
-    Args:
-        template_type: Type of letter template (internship, dutyleave, permission)
-        data: Dictionary containing template field values
-        
-    Returns:
-        BytesIO buffer containing the generated PDF
-    """
-    # Create a BytesIO buffer to receive PDF data
-    buffer = io.BytesIO()
-    
-    # Create the PDF object using ReportLab
-    doc = SimpleDocTemplate(buffer, pagesize=letter, 
-                          rightMargin=72, leftMargin=72,
-                          topMargin=72, bottomMargin=72)
-    
-    # Initialize elements list for PDF content
-    elements = []
-    styles = getSampleStyleSheet()
-    
-    # Define custom styles for PDF elements
-    title_style = ParagraphStyle(
-        'Title',
-        parent=styles['Title'],
-        fontSize=14,
-        alignment=1,  # Center alignment
-    )
-    
-    body_style = ParagraphStyle(
-        'Body',
-        parent=styles['Normal'],
-        fontSize=11,
-        spaceAfter=12,
-    )
-    
-    # Add common elements like date and address
-    current_date = data.get('Date', '')
-    elements.append(Paragraph(current_date, styles['Normal']))
-    elements.append(Spacer(1, 0.2*inch))
-    
-    # Generate template-specific content based on type
-    if template_type == 'internship':
-        # Internship request letter content
-        elements.append(Paragraph('Internship Request Letter', title_style))
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # Recipient info
-        elements.append(Paragraph('To', styles['Normal']))
-        elements.append(Paragraph(f"The HR Manager,", styles['Normal']))
-        elements.append(Paragraph(f"{data.get('companyName', '')}", styles['Normal']))
-        elements.append(Spacer(1, 0.2*inch))
-        
-        # Letter content
-        elements.append(Paragraph('Subject: Application for Internship', styles['Normal']))
-        elements.append(Spacer(1, 0.2*inch))
-        
-        elements.append(Paragraph('Dear Sir/Madam,', body_style))
-        
-        # Construct main body text with provided data
-        letter_body = f"""I am {data.get('yourName', '')}, a student pursuing {data.get('yourDegree', '')} in {data.get('yourDepartment', '')} 
-        (Semester {data.get('yourSemester', '')}). I am writing to express my interest in applying for the {data.get('Position', '')} internship 
-        position at {data.get('companyName', '')}.
-        
-        I am available to start from {data.get('startDate', '')} to {data.get('endDate', '')} and I am eager to gain practical 
-        experience in my field of study. I believe this internship would provide me with valuable industry exposure and help me develop 
-        professional skills.
-        
-        I have attached my resume for your consideration. I would be grateful for the opportunity to discuss how I can contribute 
-        to your organization.
-        
-        Thank you for considering my application.
-        """
-        
-        elements.append(Paragraph(letter_body, body_style))
-        
-        # Closing
-        elements.append(Spacer(1, 0.2*inch))
-        elements.append(Paragraph('Yours sincerely,', styles['Normal']))
-        elements.append(Spacer(1, 0.3*inch))
-        elements.append(Paragraph(f"{data.get('yourName', '')}", styles['Normal']))
-        
-    elif template_type == 'dutyleave':
-        # Duty leave letter content
-        elements.append(Paragraph('Duty Leave Application', title_style))
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # Recipient info
-        elements.append(Paragraph('To', styles['Normal']))
-        elements.append(Paragraph("The Head of Department,", styles['Normal']))
-        elements.append(Paragraph(f"{data.get('yourDepartment', '')}", styles['Normal']))
-        elements.append(Spacer(1, 0.2*inch))
-        
-        # Letter content
-        elements.append(Paragraph('Subject: Application for Duty Leave', styles['Normal']))
-        elements.append(Spacer(1, 0.2*inch))
-        
-        elements.append(Paragraph('Respected Sir/Madam,', body_style))
-        
-        letter_body = f"""I, {data.get('yourName', '')}, a student of {data.get('yourDegree', '')} (Semester {data.get('yourSemester', '')}) 
-        in {data.get('yourDepartment', '')}, would like to request duty leave on {data.get('eventDate', '')} from {data.get('startTime', '')} 
-        to {data.get('endTime', '')}.
-        
-        I am participating in "{data.get('eventName', '')}", which is being organized by {data.get('eventHolder', '')}. This event 
-        will provide me with valuable experience and knowledge in my field of study.
-        
-        I kindly request you to grant me leave for this period. I assure you that I will complete all missed assignments and lectures.
-        
-        Thank you for your consideration.
-        """
-        
-        elements.append(Paragraph(letter_body, body_style))
-        
-        # Closing
-        elements.append(Spacer(1, 0.2*inch))
-        elements.append(Paragraph('Yours sincerely,', styles['Normal']))
-        elements.append(Spacer(1, 0.3*inch))
-        elements.append(Paragraph(f"{data.get('yourName', '')}", styles['Normal']))
-        
-    elif template_type == 'permission':
-        # Permission letter content
-        elements.append(Paragraph('Permission Letter', title_style))
-        elements.append(Spacer(1, 0.3*inch))
-        
-        # Recipient info
-        elements.append(Paragraph('To', styles['Normal']))
-        elements.append(Paragraph("The Principal/Dean,", styles['Normal']))
-        elements.append(Spacer(1, 0.2*inch))
-        
-        # Letter content
-        elements.append(Paragraph('Subject: Request for Permission to Organize/Participate in Event', styles['Normal']))
-        elements.append(Spacer(1, 0.2*inch))
-        
-        elements.append(Paragraph('Respected Sir/Madam,', body_style))
-        
-        letter_body = f"""I, {data.get('yourName', '')}, Roll No. {data.get('yourRollno', '')}, a student of {data.get('yourDegree', '')} 
-        (Semester {data.get('yourSemester', '')}) in {data.get('yourDepartment', '')}, would like to request your permission 
-        to organize/participate in "{data.get('eventName', '')}" on {data.get('eventDate', '')} at {data.get('eventVenue', '')}.
-        
-        The event details are as follows:
-        {data.get('eventDescription', '')}
-        
-        The following students will be participating:
-        {data.get('studentDetails', 'N/A')}
-        
-        We assure you that all college rules will be followed during the event.
-        
-        Thank you for your consideration.
-        """
-        
-        elements.append(Paragraph(letter_body, body_style))
-        
-        # Closing
-        elements.append(Spacer(1, 0.2*inch))
-        elements.append(Paragraph('Yours sincerely,', styles['Normal']))
-        elements.append(Spacer(1, 0.3*inch))
-        elements.append(Paragraph(f"{data.get('yourName', '')}", styles['Normal']))
-    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_letter_draft(request):
+    """ Saves a new letter draft for the authenticated user. """
+    serializer = LetterDraftSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+        try:
+            template_type = serializer.validated_data.get('letter_type')
+            template = LetterTemplate.objects.filter(template_type=template_type).first()
+            draft = serializer.save(user=request.user, template=template)
+            return Response(LetterDraftSerializer(draft).data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"Error saving draft for user {request.user.id}: {e}", exc_info=True)
+            return Response({'error': 'Failed to save draft.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
-        # Handle unsupported template type
-        elements.append(Paragraph('Unsupported template type', styles['Title']))
-    
-    # Build the PDF document with all elements
-    doc.build(elements)
-    buffer.seek(0)
-    return buffer
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def get_letter_drafts(request):
-    """
-    API endpoint to retrieve all letter drafts.
-    
-    Returns:
-        - JSON response with list of draft objects
-    """
-    # Return all drafts (no user filter)
-    drafts = LetterDraft.objects.all().order_by('-updated_at')[:20]  # Limit to 20 most recent
-    drafts_data = []
-    
-    # Serialize each draft manually
-    for draft in drafts:
-        drafts_data.append({
-            'id': draft.id,
-            'letter_type': draft.letter_type,
-            'template_data': draft.template_data,
-            'created_at': draft.created_at.isoformat(),
-            'updated_at': draft.updated_at.isoformat()
-        })
-    
-    return Response({'drafts': drafts_data})
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])  # Add this to require authentication
+@permission_classes([IsAuthenticated])
 def list_letter_drafts(request):
-    """
-    List all letter drafts for the authenticated user.
-    """
-    # Get drafts for the current authenticated user only
-    drafts = LetterDraft.objects.filter(user=request.user).order_by('-updated_at')
-    
-    # Convert to list of dictionaries
-    drafts_data = []
-    for draft in drafts:
-        drafts_data.append({
-            'id': draft.id,
-            'letter_type': draft.letter_type,
-            'template_data': draft.template_data,
-            'created_at': draft.created_at.isoformat(),
-            'updated_at': draft.updated_at.isoformat()
-        })
-    
-    return Response(drafts_data)
+    """ List all letter drafts for the authenticated user. """
+    try:
+        drafts = LetterDraft.objects.filter(user=request.user).order_by('-updated_at')
+        serializer = LetterDraftSerializer(drafts, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        logger.error(f"Error listing drafts for user {request.user.id}: {e}", exc_info=True)
+        return Response({'error': 'Could not retrieve drafts.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def manage_letter_draft(request, draft_id):
-    """
-    Get, update or delete a specific letter draft.
-    
-    Methods:
-        - GET: Retrieve a specific draft
-        - PUT: Update a specific draft
-        - DELETE: Remove a specific draft
-        
-    Parameters:
-        - draft_id: ID of the draft to manage
-        
-    Returns:
-        - GET: Draft object
-        - PUT: Success message
-        - DELETE: Empty response with 204 status
-    """
+    """ Get, update or delete a specific letter draft owned by the authenticated user. """
     try:
-        # Try to get the draft by ID
-        draft = LetterDraft.objects.get(id=draft_id)
+        draft = get_object_or_404(LetterDraft, id=draft_id)
+        if draft.user != request.user:
+            logger.warning(f"User {request.user.id} attempt to access draft {draft_id} owned by user {draft.user.id}")
+            return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+        if request.method == 'GET':
+            serializer = LetterDraftSerializer(draft)
+            return Response(serializer.data)
+
+        elif request.method == 'PUT':
+            serializer = LetterDraftSerializer(draft, data=request.data, partial=True, context={'request': request})
+            if serializer.is_valid():
+                template_type = serializer.validated_data.get('letter_type', draft.letter_type)
+                template = LetterTemplate.objects.filter(template_type=template_type).first()
+                serializer.save(template=template)
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        elif request.method == 'DELETE':
+            draft.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
     except LetterDraft.DoesNotExist:
-        # Return 404 if draft doesn't exist
-        return Response({'error': 'Draft not found'}, status=404)
-    
-    if request.method == 'GET':
-        # Handle GET request - return draft data
-        data = {
-            'id': draft.id,
-            'letter_type': draft.letter_type,
-            'template_data': draft.template_data,
-            'created_at': draft.created_at.isoformat(),
-            'updated_at': draft.updated_at.isoformat()
-        }
-        return Response(data)
-    
-    elif request.method == 'PUT':
-        # Handle PUT request - update draft
-        letter_type = request.data.get('letter_type')
-        template_data = request.data.get('template_data')
-        
-        # Validate required fields
-        if not letter_type or not template_data:
-            return Response({'error': 'Missing letter type or template data'}, status=400)
-            
-        # Update and save the draft
-        draft.letter_type = letter_type
-        draft.template_data = template_data
-        draft.save()
-        
-        return Response({
-            'status': 'success',
-            'message': 'Draft updated successfully',
-            'id': draft.id
-        })
-    
-    elif request.method == 'DELETE':
-        # Handle DELETE request - remove draft
-        draft.delete()
-        return Response(status=204)
+        return Response({'error': 'Draft not found.'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Error managing draft {draft_id} for user {request.user.id}: {e}", exc_info=True)
+        return Response({'error': 'An error occurred managing the draft.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -113,3 +113,36 @@ def login_user(request):
     else:
         return Response({'error': 'Invalid credentials'}, 
                         status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    """Retrieve user's profile data including academic information"""
+    try:
+        # Get the user profile - adjust based on your actual model structure
+        user = request.user
+        
+        # If you have a separate Profile model
+        try:
+            profile = user.profile  # Assuming related_name='profile'
+            data = {
+                'user_id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'full_name': profile.full_name,
+                'department': profile.department,
+                'degree_program': profile.degree_program,
+                'semester': profile.semester,
+                'year': profile.year,
+            }
+        except AttributeError:
+            # Fallback if no profile exists
+            data = {
+                'user_id': user.id, 
+                'username': user.username,
+                'email': user.email,
+            }
+        
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
