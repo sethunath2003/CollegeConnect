@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
 
-from backend.events.scraper import scrape_events
+from .scraper import scrape_events
 from .models import Event
 import requests
 from bs4 import BeautifulSoup

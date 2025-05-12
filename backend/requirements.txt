@@ -1,0 +1,9 @@
+django
+django-cors-headers
+djangorestframework
+djangorestframework-simplejwt
+reportlab
+mysqlclient
+bs4
+jsonschema
+schedule
