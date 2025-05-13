@@ -10,7 +10,6 @@ import Signup from "./pages/Signup";
 import Homepage from "./pages/Homepage";
 import BookList from "./modules/Books/BookList";
 import BookDetail from "./modules/Books/BookDetail";
-import BookPost from "./modules/Books/BookPost";
 import LetterDraft from "./modules/Letters/LetterDraft";
 import Services from "./pages/Services";
 import BookedByMe from "./modules/Books/BookedByMe";
@@ -18,6 +17,7 @@ import PostedByMe from "./modules/Books/PostedByMe";
 import EventsPage from "./pages/EventsPage";
 import ViewDrafts from "./modules/Letters/ViewDrafts";
 import EditDraft from "./modules/Letters/EditDraft";
+import PostBook from "./modules/Books/PostBook";
 
 function App() {
   const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
@@ -89,7 +89,7 @@ function App() {
          
           <Route path="/letter-drafting" element={<LetterDraft />} />
           <Route path="/bookexchange" element={<BookList />} />
-          <Route path="/bookexchange/post" element={<BookPost />} />
+          <Route path="/bookexchange/post" element={<PostBook />} />
           <Route path="/bookexchange/book/:id" element={<BookDetail />} />
           <Route path="/bookexchange/booked" element={<BookedByMe />} />
           <Route path="/bookexchange/posted" element={<PostedByMe />} />

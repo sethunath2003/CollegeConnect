@@ -387,19 +387,24 @@ const BookList = () => {
                         >
                           View Details
                         </Link>
-                        {!book.booker_name && (
+                        
+                        {/* Only show Book Now button if the current user is NOT the owner */}
+                        {userLoggedIn && 
+                         JSON.parse(localStorage.getItem("user")).username !== book.owner_name && (
                           <button
                             onClick={() => {
-                              if (!userLoggedIn) {
-                                navigate("/login");
-                                return;
-                              }
                               setBookingBookId(book.id);
                             }}
                             className="flex-1 text-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
                           >
                             Book Now
                           </button>
+                        )}
+                        
+                        {/* Show "Your Book" indicator if the current user IS the owner */}
+                        {userLoggedIn && 
+                         JSON.parse(localStorage.getItem("user")).username === book.owner_name && (
+                          <span/>
                         )}
                       </div>
                     ))}
