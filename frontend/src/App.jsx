@@ -16,7 +16,7 @@ import PostedByMe from "./modules/Books/PostedByMe";
 import EventsPage from "./pages/EventsPage";
 import ViewDrafts from "./modules/Letters/ViewDrafts";
 import EditDraft from "./modules/Letters/EditDraft";
-import PostBook from "./modules/Books/PostBook";
+import Navigation from "./components/Navigation";
 
 function App() {
   const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
