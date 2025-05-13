@@ -65,11 +65,26 @@ const Navigation = () => {
     <header>
       {/* Main header - adjusted for all breakpoints */}
       <div className="bg-gray-900 text-white p-3 md:p-4 flex items-center justify-between w-full relative">
-        {/* Logo with direct Link component */}
+        {/* Logo modified to work as a back button */}
         <div className="flex-none pl-2 md:pl-4">
-          <Link to={isLoggedIn ? "/homepage" : "/"}>
-            <h2 className="text-2xl md:text-3xl font-bold">CollegeConnect</h2>
-          </Link>
+          <button
+            onClick={() => navigate(-1)} // This navigates to the previous page in history
+            className="text-2xl md:text-3xl font-bold text-white hover:text-blue-300 transition-colors flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            CollegeConnect
+          </button>
         </div>
 
         {/* Desktop Navigation Links - hidden on mobile */}
