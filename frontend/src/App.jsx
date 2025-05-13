@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios from "axios";
 // Import components
-import Layout from "./components/Layout";
 import About from "./pages/About"
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
@@ -18,6 +17,7 @@ import PostedByMe from "./modules/Books/PostedByMe";
 import EventsPage from "./pages/EventsPage";
 import ViewDrafts from "./modules/Letters/ViewDrafts";
 import EditDraft from "./modules/Letters/EditDraft";
+import Navigation from "./components/Navigation";
 
 function App() {
   const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
@@ -79,7 +79,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-gray-900">
-        <Layout />
+        <Navigation />
         <Routes>
           <Route path="/homepage" element={<Homepage />} />
           <Route path="/" element={<LandingPage />} />
