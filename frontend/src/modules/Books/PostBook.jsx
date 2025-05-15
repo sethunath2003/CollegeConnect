@@ -220,7 +220,7 @@ const PostBook = () => {
             htmlFor="owner_name"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Your Name
+            Your Name<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -249,7 +249,7 @@ const PostBook = () => {
             htmlFor="title"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Book Title
+            Book Title<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -275,7 +275,7 @@ const PostBook = () => {
             htmlFor="description"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Description
+            Description<span className="text-red-500">*</span>
           </label>
           <textarea
             id="description"
@@ -301,7 +301,7 @@ const PostBook = () => {
             htmlFor="location"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Location for Exchange
+            Location for Exchange<span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -327,7 +327,7 @@ const PostBook = () => {
             htmlFor="cost"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Cost ($)
+            Cost (₹)<span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -348,7 +348,7 @@ const PostBook = () => {
             </p>
           )}
           <p className="text-xs text-gray-500 mt-1">
-            Retain 0 if you're offering for free
+            Enter 0 if you're offering for free
           </p>
         </div>
 
@@ -357,7 +357,7 @@ const PostBook = () => {
             htmlFor="cover_image"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Book Cover Image
+            Book Cover Image<span className="text-red-500">*</span>
           </label>
           <input
             type="file"
