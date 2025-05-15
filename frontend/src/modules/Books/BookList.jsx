@@ -159,46 +159,43 @@ const BookList = () => {
   const submitBooking = async (bookId) => {
     // Check if user is logged in before booking
     if (!userLoggedIn) {
-      navigate("/login");
+      navigate("/login", { state: { from: `/bookexchange/book/${bookId}` } });
       return;
     }
 
     try {
-      // Call API to book the selected book
+      // Use the correct endpoint URL format: api/books/book/{bookId}/select/
       const response = await axios.post(
-        `http://localhost:8000/api/books/${bookId}/select_book/`,
-        bookingFormData
+        `http://localhost:8000/api/books/book/${bookId}/select/`,
+        bookingFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      // Update local state to reflect changes
-      const updatedBooks = books.map((book) =>
-        book.id === bookId
-          ? {
-              ...book,
-              booker_name: bookingFormData.booker_name,
-              booker_email: bookingFormData.booker_email,
-            }
-          : book
-      );
+      // Close booking modal
+      setBookingBookId(null);
 
-      setBooks(updatedBooks);
-      setFilteredBooks(
-        filteredBooks.map((book) =>
-          book.id === bookId
-            ? {
-                ...book,
-                booker_name: bookingFormData.booker_name,
-                booker_email: bookingFormData.booker_email,
-              }
-            : book
+      // Update the books list to show the book as booked
+      setBooks((prevBooks) =>
+        prevBooks.map((book) =>
+          book.id === bookId ? response.data.book || response.data : book
         )
       );
-
-      // Reset booking state
-      setBookingBookId(null);
+      setFilteredBooks((prevBooks) =>
+        prevBooks.map((book) =>
+          book.id === bookId ? response.data.book || response.data : book
+        )
+      );
     } catch (err) {
-      console.error("Booking error:", err);
-      setBookingError("Booking failed. Please try again.");
+      console.error("Booking error: ", err);
+      setBookingError(
+        err.response?.data?.error ||
+          "Could not book this item. Please try again later."
+      );
     }
   };
 
@@ -387,25 +384,25 @@ const BookList = () => {
                         >
                           View Details
                         </Link>
-                        
+
                         {/* Only show Book Now button if the current user is NOT the owner */}
-                        {userLoggedIn && 
-                         JSON.parse(localStorage.getItem("user")).username !== book.owner_name && (
-                          <button
-                            onClick={() => {
-                              setBookingBookId(book.id);
-                            }}
-                            className="flex-1 text-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
-                          >
-                            Book Now
-                          </button>
-                        )}
-                        
+                        {userLoggedIn &&
+                          JSON.parse(localStorage.getItem("user")).username !==
+                            book.owner_name && (
+                            <button
+                              onClick={() => {
+                                setBookingBookId(book.id);
+                              }}
+                              className="flex-1 text-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                            >
+                              Book Now
+                            </button>
+                          )}
+
                         {/* Show "Your Book" indicator if the current user IS the owner */}
-                        {userLoggedIn && 
-                         JSON.parse(localStorage.getItem("user")).username === book.owner_name && (
-                          <span/>
-                        )}
+                        {userLoggedIn &&
+                          JSON.parse(localStorage.getItem("user")).username ===
+                            book.owner_name && <span />}
                       </div>
                     ))}
                 </div>

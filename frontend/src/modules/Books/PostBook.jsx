@@ -160,7 +160,7 @@ const PostBook = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/books/post/",
+        "http://localhost:8000/api/book/post/",
         bookFormData,
         {
           headers: {

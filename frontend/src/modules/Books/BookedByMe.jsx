@@ -36,9 +36,9 @@ const BookedByMe = () => {
         const userData = JSON.parse(storedUserData);
         setUserData(userData);
 
-        // Fetch books booked by the current user using the correct endpoint
+        // Updated endpoint to match backend URL pattern
         const response = await axios.get(
-          "http://localhost:8000/api/books/booked_by_me/",
+          "http://localhost:8000/api/books/my/booked/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

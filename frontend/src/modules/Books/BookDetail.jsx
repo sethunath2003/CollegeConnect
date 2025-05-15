@@ -58,7 +58,7 @@ const BookDetail = () => {
     const fetchBookDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/books/${id}/`,
+          `http://localhost:8000/api/books/book/${id}/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

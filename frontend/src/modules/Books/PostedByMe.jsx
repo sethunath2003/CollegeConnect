@@ -39,8 +39,9 @@ const PostedByMe = () => {
         const userData = JSON.parse(storedUserData);
         setUserData(userData);
 
+        // Updated endpoint to match backend URL pattern
         const response = await axios.get(
-          "http://localhost:8000/api/books/posted_by_me/",
+          "http://localhost:8000/api/books/my/posted/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -87,15 +88,15 @@ const PostedByMe = () => {
   const handleSaveEdit = async (bookId) => {
     try {
       setLoading(true);
-      
+
       // Use the correct API endpoint - this should match what's defined in your backend
       const response = await axios.patch(
-        `http://localhost:8000/api/books/update/${bookId}/`,  // Updated endpoint
+        `http://localhost:8000/api/books/update/${bookId}/`, // Updated endpoint
         formData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",  // Explicitly set content type
+            "Content-Type": "application/json", // Explicitly set content type
           },
         }
       );
@@ -109,16 +110,17 @@ const PostedByMe = () => {
 
       // Exit edit mode
       setEditingBook(null);
-      
+
       // Show success message (optional)
       setError(null); // Clear any previous errors
-      
     } catch (err) {
       console.error("Failed to update book:", err);
-      
+
       // Provide detailed error message
       if (err.response) {
-        setError(`Failed to update book: ${err.response.status} ${err.response.statusText}`);
+        setError(
+          `Failed to update book: ${err.response.status} ${err.response.statusText}`
+        );
       } else {
         setError("Failed to update book. Network error or server unavailable.");
       }
