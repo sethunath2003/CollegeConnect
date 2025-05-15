@@ -152,11 +152,15 @@ const PostBook = () => {
       const bookFormData = new FormData();
 
       for (const key in formData) {
-        bookFormData.append(key, formData[key]);
+        if (key === "cost") {
+          bookFormData.append("cost", parseFloat(formData.cost) || 0); // Ensure number
+        } else {
+          bookFormData.append(key, formData[key]);
+        }
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/books/create/",
+        "http://localhost:8000/api/books/post/",
         bookFormData,
         {
           headers: {
@@ -334,10 +338,9 @@ const PostBook = () => {
             className={`w-full p-2 border ${
               errors.cost ? "border-red-500" : "border-gray-300"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            step="0.01"
+            step="1"
             min="0"
             required
-            placeholder="0.00"
           />
           {errors.cost && (
             <p className="error-message text-red-500 text-xs mt-1">
@@ -345,7 +348,7 @@ const PostBook = () => {
             </p>
           )}
           <p className="text-xs text-gray-500 mt-1">
-            Enter 0 if you're offering for free
+            Retain 0 if you're offering for free
           </p>
         </div>
 
