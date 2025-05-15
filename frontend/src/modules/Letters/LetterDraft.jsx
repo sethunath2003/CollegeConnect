@@ -165,7 +165,7 @@ const LetterDraft = () => {
       const response = await axios.post(
         "http://localhost:8000/api/letters/generate/",
         {
-          template: templateType,
+          template_type: templateType,
           data: formData,
         },
         { responseType: "blob" }

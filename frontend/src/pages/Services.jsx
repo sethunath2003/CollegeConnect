@@ -86,7 +86,6 @@ const Services = () => {
               <li>Discover upcoming hackathons</li>
               <li>Find networking events</li>
               <li>Join workshops and seminars</li>
-              <li>Post your own events</li>
             </ul>
             <Link to="/eventlister">
               <button className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded transition-colors">
