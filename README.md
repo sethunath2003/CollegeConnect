@@ -1,6 +1,6 @@
 # CollegeConnect
 
-This is the repository for the S6 Mini project: **CollegeConnect** – a comprehensive platform designed to streamline college life through resource sharing, event discovery, and automated letter drafting.
+ **CollegeConnect** – a comprehensive platform designed to streamline college life through resource sharing, event discovery, and automated letter drafting.
 
 ---
 
@@ -107,8 +107,10 @@ Pull requests and suggestions are welcome! Please fork the repo and submit your 
 
 ## 👤 Author
 
-- [sethunath2003](https://github.com/sethunath2003)
-
+- [Sethunath A](https://github.com/sethunath2003)
+- [Sreya Elizabeth Shibu](https://github.com/Sreyaes)
+- [Japheth Santhosh](https://github.com/Japheth-Santosh)
+- [Varsha Sunil Mathai](https://github.com/varshasunil9)
 ---
 
 ## 📞 Contact
