@@ -1,9 +1,11 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.renderers import JSONRenderer
+from .renderers import PDFRenderer
 import logging
 import json
 from .utils import generate_pdf_from_template, generate_pdf_from_template_structure
@@ -136,5 +138,35 @@ def manage_letter_draft(request, draft_id):
     except Exception as e:
         logger.error(f"Error managing draft {draft_id} for user {request.user.id}: {e}", exc_info=True)
         return Response({'error': 'An error occurred managing the draft.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@renderer_classes([PDFRenderer, JSONRenderer])
+def generate_pdf(request):
+    """Generate a PDF and return it. Uses PDFRenderer so DRF can satisfy Accept: application/pdf."""
+    # Use DRF-parsed data (supports JSON body and form data)
+    template_type = request.data.get('template_type')
+    form_data = request.data.get('data', {})
+
+    if not template_type or not form_data:
+        return Response({'error': 'Missing template_type or form data.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        template = LetterTemplate.objects.get(template_type=template_type)
+    except LetterTemplate.DoesNotExist:
+        return Response({'error': f'Template "{template_type}" not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    pdf_buffer = generate_pdf_from_template_structure(template.pdf_structure, form_data)
+    if isinstance(pdf_buffer, dict):
+        # util returns an error dict
+        return Response(pdf_buffer, status=pdf_buffer.get('status', 500))
+
+    # Return raw bytes — PDFRenderer will handle streaming
+    try:
+        pdf_buffer.seek(0)
+    except Exception:
+        pass
+
+    return Response(pdf_buffer, content_type='application/pdf')
 
 

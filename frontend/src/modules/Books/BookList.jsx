@@ -331,7 +331,7 @@ const BookList = () => {
                     Posted by: {book.owner_name || "Anonymous"}
                   </p>
                   <p className="text-lg font-bold text-green-600 mb-2">
-                    ${book.cost}
+                    ₹{book.cost}
                   </p>
                   <p className="text-sm text-gray-600 mb-4">
                     Location: {book.location}
@@ -459,7 +459,7 @@ const BookList = () => {
                   </h3>
                   <p className="text-sm text-gray-600 mb-2">Posted by: User</p>
                   <p className="text-lg font-bold text-green-600 mb-2">
-                    $15.99
+                    ₹15.99
                   </p>
                   <p className="text-sm text-gray-600 mb-4">
                     Location: Main Campus

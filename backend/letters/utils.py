@@ -1,157 +1,153 @@
-from django.http import HttpResponse
+import io
+import json
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
-from django.template.loader import render_to_string
-import io
-import os
-from django.conf import settings
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
 
 def generate_pdf_from_template(data, template_name):
     """
-    Generate a PDF document from a template file.
-    
-    This function loads a text-based template, fills it with provided data,
-    and renders it as a PDF document using ReportLab.
-    
-    Args:
-        data (dict): Dictionary containing the values to insert in the template
-        template_name (str): Name of the template file without extension
-        
-    Returns:
-        HttpResponse: Response object containing the PDF file
-        or dict: Error information if generation fails
+    Generate a PDF document from a text template (rendered via Django templates).
+    Returns a BytesIO buffer containing PDF data, or an error dict.
     """
     try:
-        # Construct the correct template path
+        # 1. Render the text template to a string
         template_path = f'letters/{template_name}.txt'
-        
-        # Use Django's template engine to fill placeholders
-        filled_template = render_to_string(template_path, data)
-        
-        # Create a BytesIO buffer to receive PDF data
+        filled = render_to_string(template_path, data)
+
+        # 2. Draw lines onto a ReportLab canvas
         buffer = io.BytesIO()
-        
-        # Initialize the PDF canvas with letter size
         c = canvas.Canvas(buffer, pagesize=letter)
         c.setFont('Helvetica', 12)
-        
-        # Start from top of page
-        y_position = 10 * inch  # Start at the top
-        
-        # Process the template line by line
-        lines = filled_template.split('\n')
-        for line in lines:
-            if line.strip():  # Skip empty lines
-                c.drawString(1 * inch, y_position, line)
-                y_position -= 0.2 * inch  # Move down for the next line
+        y = 10 * inch
+
+        for line in filled.splitlines():
+            if line.strip():
+                c.drawString(1 * inch, y, line)
+                y -= 0.2 * inch
             else:
-                y_position -= 0.1 * inch  # Smaller space for empty lines
-        
-        # Finalize the PDF and prepare the response
+                y -= 0.1 * inch
+
+            # start new page if we overflow
+            if y < inch:
+                c.showPage()
+                c.setFont('Helvetica', 12)
+                y = 10 * inch
+
         c.showPage()
         c.save()
-        
-        # Reset buffer position for reading
+
         buffer.seek(0)
-        
-        # Create HTTP response with PDF content
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="{template_name}_letter.pdf"'
-        return response
+        return buffer
+
     except Exception as e:
-        # Log the error for debugging
         print(f"PDF generation error: {e}")
-        # Return error information
         return {'error': str(e), 'status': 500}
+
 
 def generate_pdf_from_template_structure(structure, data):
     """
-    Generate PDF using a template structure from the database
-    
-    Args:
-        structure: JSON structure defining the PDF layout
-        data: Form data to populate the template
-        
-    Returns:
-        BytesIO buffer containing the generated PDF
+    Generate a PDF document from a structured definition:
+    'structure' is a dict with a 'sections' list, each section dict
+    describes one block: title, paragraph, table, spacer, etc.
+    Returns a BytesIO buffer containing PDF data, or an error dict.
     """
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, 
-                          rightMargin=72, leftMargin=72,
-                          topMargin=72, bottomMargin=72)
-    
-    elements = []
-    styles = getSampleStyleSheet()
-    
-    # Create custom styles
-    title_style = ParagraphStyle(
-        'Title',
-        parent=styles['Title'],
-        fontSize=14,
-        alignment=1,  # Center alignment
-    )
-    
-    body_style = ParagraphStyle(
-        'Body',
-        parent=styles['Normal'],
-        fontSize=11,
-        spaceAfter=12,
-    )
-    
-    # Process each section in the template structure
-    for section in structure.get('sections', []):
-        section_type = section.get('type')
-        
-        if section_type == 'title':
-            # Title element
-            elements.append(Paragraph(section.get('text', ''), title_style))
-            
-        elif section_type == 'spacer':
-            # Spacer element
-            size = section.get('size', 0.2)
-            elements.append(Spacer(1, size * inch))
-            
-        elif section_type == 'date':
-            # Date element from form data
-            date_field = section.get('field', 'Date')
-            elements.append(Paragraph(data.get(date_field, ''), styles['Normal']))
-            
-        elif section_type == 'recipient':
-            # Recipient section
-            elements.append(Paragraph('To', styles['Normal']))
-            elements.append(Paragraph(section.get('text', ''), styles['Normal']))
-            if 'field' in section:
-                elements.append(Paragraph(data.get(section['field'], ''), styles['Normal']))
-                
-        elif section_type == 'subject':
-            # Subject line
-            elements.append(Paragraph(f"Subject: {section.get('text', '')}", styles['Normal']))
-            
-        elif section_type == 'greeting':
-            # Greeting line
-            elements.append(Paragraph(section.get('text', 'Dear Sir/Madam,'), styles['Normal']))
-            
-        elif section_type == 'body':
-            # Main body text - replace placeholders with actual data
-            template_text = section.get('template', '')
-            # Replace all placeholders in format {field_name} with actual data
-            for field, value in data.items():
-                template_text = template_text.replace(f"{{{field}}}", str(value))
-            elements.append(Paragraph(template_text, body_style))
-            
-        elif section_type == 'closing':
-            # Closing line
-            elements.append(Paragraph(section.get('text', 'Yours sincerely,'), styles['Normal']))
-            
-        elif section_type == 'signature':
-            # Signature line - use field from data
-            field = section.get('field', 'yourName')
-            elements.append(Paragraph(data.get(field, ''), styles['Normal']))
-    
-    # Build PDF document
-    doc.build(elements)
-    buffer.seek(0)
-    return buffer
+    # Validate structure type early — callers/tests expect a ValueError for invalid structure
+    if not isinstance(structure, dict):
+        raise ValueError("Invalid pdf structure: expected a dict")
+
+    try:
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=letter,
+            rightMargin=72, leftMargin=72,
+            topMargin=72, bottomMargin=72
+        )
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # First, look under “sections”, fall back to “elements”
+        sections = structure.get('sections') or structure.get('elements') or []
+
+        for section in sections:
+            t = section.get('type')
+
+            # Helper: resolve text from several possible keys: text, template, or field
+            def _resolve_text(sec):
+                # 1) explicit static text
+                if 'text' in sec and sec.get('text') is not None:
+                    return str(sec.get('text'))
+                # 2) template formatting using Python str.format
+                if 'template' in sec and sec.get('template') is not None:
+                    tmpl = sec.get('template')
+                    # Use a safe mapping so missing keys become empty strings instead of raising
+                    class SafeDict(dict):
+                        def __missing__(self, key):
+                            return ''
+                    try:
+                        return tmpl.format_map(SafeDict(data or {}))
+                    except Exception:
+                        # If formatting still fails for some reason, fall back to raw template
+                        return str(tmpl)
+                # 3) a field key pointing into `data`
+                field = sec.get('field')
+                if field:
+                    return str(data.get(field, ''))
+                return ''
+
+            if t == 'title':
+                text = _resolve_text(section)
+                elements.append(Paragraph(text, styles['Title']))
+                elements.append(Spacer(1, 12))
+
+            elif t == 'heading':
+                text = _resolve_text(section)
+                # Heading2 may not exist in all style sheets; fall back gracefully
+                style = styles.get('Heading2', styles.get('Heading1'))
+                elements.append(Paragraph(text, style))
+                elements.append(Spacer(1, 8))
+
+            elif t == 'paragraph':
+                text = _resolve_text(section)
+                elements.append(Paragraph(text, styles['BodyText']))
+                elements.append(Spacer(1, 6))
+
+            elif t == 'spacer':
+                # support either 'height' or 'size' keys
+                height = section.get('height', section.get('size', 12))
+                try:
+                    height = float(height)
+                except Exception:
+                    height = 12
+                elements.append(Spacer(1, height))
+
+            elif t == 'table':
+                # Expect section['columns'] and data list at section['field']
+                cols = section.get('columns', []) or []
+                rows = data.get(section.get('field'), []) if isinstance(data, dict) else []
+                if not isinstance(rows, list):
+                    rows = []
+                table_data = [cols] + [[row.get(c, '') for c in cols] for row in rows]
+                tbl = Table(table_data, hAlign='LEFT')
+                tbl.setStyle(TableStyle([
+                    ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                    ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+                ]))
+                elements.append(tbl)
+                elements.append(Spacer(1, 12))
+
+            # add other section types here…
+
+        # THIS is the crucial step: build the PDF into the buffer
+        doc.build(elements)
+        buffer.seek(0)
+        return buffer
+
+    except Exception as e:
+        print(f"PDF generation error: {e}")
+        return {'error': str(e), 'status': 500}

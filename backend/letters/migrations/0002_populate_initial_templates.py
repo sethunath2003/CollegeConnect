@@ -131,7 +131,7 @@ INITIAL_TEMPLATES = [
                 {"name": "eventDate", "label": "Event Date", "type": "date", "required": True},
                 {"name": "startTime", "label": "Start Time", "type": "time", "required": True},
                 {"name": "endTime", "label": "End Time", "type": "time", "required": True},
-                {"name": "eventDescription", "label": "Event Description", "type": "textarea", "required": True},
+                {"name": "eventDescription", "label": "Event Description", "type": "textarea", "required": False},
                 {"name": "studentDetails", "label": "Student Details (other students if applicable)", "type": "textarea", "required": False},
                 {"name": "Date", "label": "Current Date", "type": "date", "required": True}
              ]
@@ -159,7 +159,61 @@ INITIAL_TEMPLATES = [
                  {"type": "paragraph", "field": "yourName", "style": "Normal"}
              ]
         },
-        "validation_schema": None # Optional: Define if needed
+        "validation_schema": {
+            "type": "object",
+            "required": ["yourName", "yourEmail", "yourDegree", "yourDepartment", "yourSemester", 
+                         "yourRollno", "eventName", "eventHolder", "eventVenue", "eventDate", 
+                         "startTime", "endTime", "Date"],
+            "properties": {
+                "yourName": {"type": "string", "minLength": 1, "pattern": "^[a-zA-Z ]+$"},
+                "yourEmail": {"type": "string", "format": "email"},
+                "yourDegree": {"type": "string", "minLength": 2, "pattern": "^[a-zA-Z ]+$"},
+                "yourDepartment": {"type": "string", "minLength": 3, "pattern": "^[a-zA-Z ]+$"},
+                "yourSemester": {"type": "integer", "minimum": 1},
+                "yourRollno": {"type": "string", "minLength": 1, "pattern": "^[A-Z0-9]+$"},
+                "eventName": {"type": "string", "minLength": 2},
+                "eventHolder": {"type": "string", "minLength": 2},
+                "eventVenue": {"type": "string", "minLength": 2},
+                "eventDate": {"type": "string", "format": "date"},
+                "startTime": {"type": "string", "format": "time"},
+                "endTime": {"type": "string", "format": "time"},
+                "eventDescription": {"type": "string", "minLength": 10},
+                "studentDetails": {"type": "string"}, # Optional field
+                "Date": {"type": "string", "format": "date"}
+            },
+            "allOf": [
+                {
+                    "if": {
+                        "properties": { "eventDate": { "type": "string" }, "Date": { "type": "string" } },
+                        "required": ["eventDate", "Date"]
+                    },
+                    "then": {
+                        "properties": {
+                            "eventDate": { 
+                                "formatMinimum": { "$data": "1/Date" }
+                            }
+                        }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": { "startTime": { "type": "string" }, "endTime": { "type": "string" } },
+                        "required": ["startTime", "endTime"]
+                    },
+                    "then": {
+                        "dependencies": {
+                            "endTime": {
+                                "properties": {
+                                    "endTime": { 
+                                        "formatExclusiveMinimum": { "$data": "1/startTime" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
     },
      {
         "name": "Permission Letter",
@@ -211,7 +265,44 @@ INITIAL_TEMPLATES = [
                  {"type": "paragraph", "field": "yourName", "style": "Normal"}
              ]
         },
-        "validation_schema": None # Optional: Define if needed
+        "validation_schema": {
+            "type": "object",
+            "required": ["yourName", "yourEmail", "yourDegree", "yourDepartment", "yourSemester", 
+                         "yourRollno", "eventName", "eventVenue", "eventDate", 
+                         "eventDescription", "recipientName", "recipientTitle", "Date"],
+            "properties": {
+                "yourName": {"type": "string", "minLength": 1, "pattern": "^[a-zA-Z ]+$"},
+                "yourEmail": {"type": "string", "format": "email"},
+                "yourDegree": {"type": "string", "minLength": 2, "pattern": "^[a-zA-Z ]+$"},
+                "yourDepartment": {"type": "string", "minLength": 3, "pattern": "^[a-zA-Z ]+$"},
+                "yourSemester": {"type": "integer", "minimum": 1},
+                "yourRollno": {"type": "string", "minLength": 1, "pattern": "^[A-Z0-9]+$"},
+                "eventName": {"type": "string", "minLength": 2},
+                "eventHolder": {"type": "string"}, # Optional field
+                "eventVenue": {"type": "string", "minLength": 2},
+                "eventDate": {"type": "string", "format": "date"},
+                "eventDescription": {"type": "string", "minLength": 10},
+                "studentDetails": {"type": "string"}, # Optional field
+                "recipientName": {"type": "string", "minLength": 2, "pattern": "^[a-zA-Z. ]+$"},
+                "recipientTitle": {"type": "string", "minLength": 2},
+                "Date": {"type": "string", "format": "date"}
+            },
+            "allOf": [
+                {
+                    "if": {
+                        "properties": { "eventDate": { "type": "string" }, "Date": { "type": "string" } },
+                        "required": ["eventDate", "Date"]
+                    },
+                    "then": {
+                        "properties": {
+                            "eventDate": { 
+                                "formatMinimum": { "$data": "1/Date" }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
     }
     # --- Add more template dictionaries here for others like 'recommendation', 'application', 'custom' ---
     # --- Make sure 'template_type' is unique for each ---

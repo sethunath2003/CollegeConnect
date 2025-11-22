@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import api from "../../api/axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 const LetterDraft = () => {
@@ -140,13 +141,70 @@ const LetterDraft = () => {
     const template = getSelectedTemplateData();
     if (!template || !template.validation_schema) return true;
 
-    // Use a library like Ajv to validate against the JSON schema
-    // This is just pseudocode
-    const isValid = validateAgainstSchema(formData, template.validation_schema);
-    if (!isValid) {
-      showAlert("error", "Please check your form fields for errors.");
-      return false;
+    // Simple validation for required fields
+    const schema = template.validation_schema;
+    if (schema.required) {
+      for (const field of schema.required) {
+        if (!formData[field] || formData[field].trim() === "") {
+          showAlert("error", `${field} is required.`);
+          return false;
+        }
+      }
     }
+
+    // Pattern validation
+    if (schema.properties) {
+      for (const [field, rules] of Object.entries(schema.properties)) {
+        if (formData[field] && rules.pattern) {
+          const regex = new RegExp(rules.pattern);
+          if (!regex.test(formData[field])) {
+            showAlert("error", `${field} has an invalid format.`);
+            return false;
+          }
+        }
+      }
+    }
+
+    // Date comparison validation (basic implementation)
+    if (schema.allOf) {
+      for (const condition of schema.allOf) {
+        if (condition.if && condition.if.properties) {
+          const dateFields = Object.keys(condition.if.properties);
+          if (
+            dateFields.length === 2 &&
+            dateFields.every((field) => formData[field])
+          ) {
+            const [field1, field2] = dateFields;
+
+            // Check if this is a date comparison
+            if (field1.includes("Date") && field2.includes("Date")) {
+              const date1 = new Date(formData[field1]);
+              const date2 = new Date(formData[field2]);
+
+              // If formatMinimum is specified, field1 should be >= field2
+              if (condition.then?.properties?.[field1]?.formatMinimum) {
+                if (date1 < date2) {
+                  showAlert(
+                    "error",
+                    `${field1} must be on or after ${field2}.`
+                  );
+                  return false;
+                }
+              }
+            }
+
+            // Check for time comparison (for Duty Leave)
+            else if (field1.includes("Time") && field2.includes("Time")) {
+              if (formData[field1] >= formData[field2]) {
+                showAlert("error", `${field1} must be before ${field2}.`);
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+
     return true;
   };
 
@@ -162,26 +220,118 @@ const LetterDraft = () => {
   const submitLetterData = async (templateType) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/letters/generate/",
+      console.log("Sending request with data:", {
+        template_type: templateType,
+        data: formData,
+      });
+
+      const response = await api.post(
+        "/letters/generate/",
         {
           template_type: templateType,
           data: formData,
         },
-        { responseType: "blob" }
+        {
+          responseType: "arraybuffer",
+          headers: {
+            // Request PDF explicitly
+            Accept: "application/pdf",
+          },
+        }
       );
 
-      // Create URL for the blob response
+      console.log("Response received:");
+      console.log("- Content-Type:", response.headers["content-type"]);
+      console.log("- Content-Length:", response.data.byteLength);
+      console.log("- Status:", response.status);
+
+      // Validate PDF response by header and magic bytes
+      const contentType = response.headers["content-type"] || "";
+      // Check content-type loosely
+      if (!contentType.includes("application/pdf")) {
+        console.warn("Content-Type isn't application/pdf:", contentType);
+      }
+
+      // Check PDF magic bytes (%PDF-)
+      const headerBytes = new Uint8Array(response.data.slice(0, 5));
+      const headerStr = new TextDecoder("utf-8").decode(headerBytes);
+      if (!headerStr.startsWith("%PDF")) {
+        console.error("Invalid PDF magic bytes:", headerStr, headerBytes);
+        // Try to decode response as text to show server error
+        try {
+          const text = new TextDecoder().decode(response.data);
+          console.error("Server response (text):", text.substring(0, 500));
+          showAlert(
+            "error",
+            "Server returned an invalid PDF document: " +
+              (text.slice(0, 200) || "")
+          );
+        } catch (e) {
+          showAlert("error", "Server returned an invalid PDF document.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Create blob with explicit PDF type
       const blob = new Blob([response.data], { type: "application/pdf" });
       const pdfUrl = URL.createObjectURL(blob);
 
-      // Set PDF data and show success notification
+      // Download immediately as test
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.download = `${templateType}_${Date.now().toString()}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Also set PDF data for the UI
       setPdfData(pdfUrl);
       setPdfSuccess(true);
       setLoading(false);
     } catch (error) {
       console.error("Failed to generate PDF:", error);
-      showAlert("error", "Failed to generate PDF. Please try again.");
+
+      let errorMessage = "Failed to generate PDF. Please try again.";
+
+      if (error.response) {
+        console.error("Server response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+
+        // For debugging - log first few bytes if available
+        if (
+          error.response.data instanceof ArrayBuffer &&
+          error.response.data.byteLength > 0
+        ) {
+          const firstBytes = new Uint8Array(error.response.data.slice(0, 20));
+          console.error(
+            "First bytes of error response:",
+            Array.from(firstBytes)
+          );
+
+          try {
+            const decoder = new TextDecoder();
+            const text = decoder.decode(error.response.data);
+            console.error("Response as text:", text.substring(0, 500));
+
+            try {
+              const errorData = JSON.parse(text);
+              errorMessage =
+                errorData.error || errorData.detail || errorMessage;
+            } catch (jsonError) {
+              // If it's not JSON but contains error text, use that
+              if (text.includes("error") || text.includes("Error")) {
+                errorMessage =
+                  text.substring(0, 150) + (text.length > 150 ? "..." : "");
+              }
+            }
+          } catch (decodeError) {
+            console.error("Error decoding response data:", decodeError);
+          }
+        }
+      }
+
+      showAlert("error", errorMessage);
       setLoading(false);
     }
   };
@@ -238,18 +388,28 @@ const LetterDraft = () => {
   // Functions to handle PDF actions
   const downloadPDF = () => {
     if (pdfData) {
-      const link = document.createElement("a");
-      link.href = pdfData;
-      link.download = `${selectedTemplate}_letter.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        const link = document.createElement("a");
+        link.href = pdfData;
+        link.download = `${selectedTemplate}_letter.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error("Error downloading PDF:", error);
+        showAlert("error", "Error downloading PDF. Please try again.");
+      }
     }
   };
 
   const viewPDF = () => {
     if (pdfData) {
-      window.open(pdfData, "_blank");
+      try {
+        window.open(pdfData, "_blank");
+      } catch (error) {
+        console.error("Error viewing PDF:", error);
+        showAlert("error", "Error viewing PDF. Please try again.");
+      }
     }
   };
 

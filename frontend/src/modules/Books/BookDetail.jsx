@@ -150,7 +150,7 @@ const BookDetail = () => {
                 {book.title}
               </h2>
               <p className="text-xl font-bold text-green-600 mb-4">
-                ${book.cost}
+                ₹{book.cost}
               </p>
 
               <div className="mb-4">

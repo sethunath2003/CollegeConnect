@@ -117,7 +117,7 @@ const BookedByMe = () => {
                     Posted by: {book.owner_name || "Anonymous"}
                   </p>
                   <p className="text-lg font-bold text-green-600 mb-2">
-                    ${book.cost}
+                    ₹{book.cost}
                   </p>
                   <p className="text-sm text-gray-600 mb-4">
                     Location: {book.location}
