@@ -99,6 +99,20 @@ npm run dev
 
 ---
 
+## 📖 Interview Preparation
+
+Preparing for an interview where you'll discuss this project? Check out our comprehensive **[Interview Preparation Guide](./INTERVIEW_PREP.md)**!
+
+This guide includes:
+- 50+ technical questions with detailed answers
+- Code examples and implementation details
+- Architecture and design pattern explanations
+- Behavioral questions using the STAR method
+- Practice questions and resources
+- Final checklist before your interview
+
+---
+
 ## 🤝 Contributing
 
 Pull requests and suggestions are welcome! Please fork the repo and submit your changes via PR.
